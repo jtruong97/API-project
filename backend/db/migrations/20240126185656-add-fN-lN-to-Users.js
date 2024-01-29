@@ -17,11 +17,13 @@ module.exports = {
     const table = { tableName: 'Users', ...options }
 
     await queryInterface.addColumn(table,'firstName',{
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: false
     })
 
     await queryInterface.addColumn(table,'lastName',{
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: FileSystemWritableFileStream
     })
   },
 
