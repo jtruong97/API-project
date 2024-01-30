@@ -48,7 +48,9 @@ module.exports = {
     options.tableName = 'SpotImages';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      url: { [Op.in]: ['Demo-lition', 'FakeUser1', 'FakeUser2'] }
+      url: { [Op.in]: ['https://media.istockphoto.com/id/1318936929/photo/modern-luxurious-villa-with-garden.jpg?s=1024x1024&w=is&k=20&c=o4-4QSVjVvw9Eo_WDLRieGKdqqoSaqG66sFQaiohR6k=',
+      'https://media.istockphoto.com/id/1457567236/photo/modern-villa-exterior-with-air-heat-pumps-in-garden.jpg?s=1024x1024&w=is&k=20&c=abfDUS3MAhrz8leVWpPF-OkBjf4oxAFQzN991U_Loo0=',
+      'https://media.istockphoto.com/id/1026205392/photo/beautiful-luxury-home-exterior-at-twilight.jpg?s=1024x1024&w=is&k=20&c=_s4AQ2-vNONUaMT0izUGe_ykG3sg__QeUkvFaqu8jnc='] }
     }, {});
   }
 };
