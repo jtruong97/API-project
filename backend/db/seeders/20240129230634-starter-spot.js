@@ -54,7 +54,8 @@ module.exports = {
         name: 'third listing',
         description:'florida home',
         price:113.34
-      }
+      },
+
 
     ], { validate: true })
 
