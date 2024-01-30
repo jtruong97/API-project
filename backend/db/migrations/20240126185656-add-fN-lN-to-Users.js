@@ -23,7 +23,7 @@ module.exports = {
 
     await queryInterface.addColumn(table,'lastName',{
       type: Sequelize.STRING,
-      allowNull: FileSystemWritableFileStream
+      allowNull: true
     })
   },
 
