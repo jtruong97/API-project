@@ -55,7 +55,10 @@ router.get('/current', async (req, res) => { //get all spots owned by the curren
         avgRating += review.stars
     })
     spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1) //add avgRating into spot obj
-    //console.log('avgRating',avgRating)
+
+    if(isNaN(spot.dataValues.avgRating)){
+        delete spot.dataValues.avgRating
+    }
 
     const prevImg = await SpotImage.findOne({
         where: {
@@ -67,7 +70,24 @@ router.get('/current', async (req, res) => { //get all spots owned by the curren
     }
 }
 
-   return res.json({spots})
+    return res.json({spots})
+//    return {
+//     id: spots.id,
+// 	ownerId: spots.ownerId,
+// 	address: spots.address,
+// 	city: spots.city,
+// 	state: spots.state,
+// 	country: spots.country,
+// 	lat: spots.lat,
+// 	lng: spots.lng,
+// 	name: spots.name,
+// 	description: spots.description,
+// 	price: spots.price,
+// 	createdAt: spots.createdAt,
+// 	updatedAt: spots.updatedAt,
+//     avgRating: spots.avgRating,
+//     previewImage: spots.previewImage
+//    }
 })
 
 router.get('/:spotId', async (req,res) => {
@@ -97,6 +117,9 @@ router.get('/:spotId', async (req,res) => {
         avgRating += review.stars
     })
     spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1)
+    if(isNaN(spot.dataValues.avgRating)){
+        delete spot.dataValues.avgRating
+    }
 
     res.json({spot})
 })
@@ -134,31 +157,30 @@ check('price')
 ];
 
 router.post('/', validateSpot, async (req,res) => { //create a spot
-    try{
+    //try{
         let { address, city, state, country, lat, lng, name, description, price } = req.body; //destructure
         const userId = req.user.id
-        Spot.ownerId = userId
 
-        let newSpot = await Spot.create({ ownerId, address, city, state, country, lat, lng, name, description, price })
+        let newSpot = await Spot.create({ ownerId: userId, address, city, state, country, lat, lng, name, description, price })
 
         res.json(newSpot)
-    }
-    catch(error){
-        return res.status(400).json({
-            "message": "Bad Request",
-            "errors": {
-              "address": "Street address is required",
-              "city": "City is required",
-              "state": "State is required",
-              "country": "Country is required",
-              "lat": "Latitude must be within -90 and 90",
-              "lng": "Longitude must be within -180 and 180",
-              "name": "Name must be less than 50 characters",
-              "description": "Description is required",
-              "price": "Price per day must be a positive number"
-            }
-          })
-    }
+    // }
+    // catch(error){
+    //     return res.status(400).json({
+    //         "message": "Bad Request",
+    //         "errors": {
+    //           "address": "Street address is required",
+    //           "city": "City is required",
+    //           "state": "State is required",
+    //           "country": "Country is required",
+    //           "lat": "Latitude must be within -90 and 90",
+    //           "lng": "Longitude must be within -180 and 180",
+    //           "name": "Name must be less than 50 characters",
+    //           "description": "Description is required",
+    //           "price": "Price per day must be a positive number"
+    //         }
+    //       })
+    // }
 })
 
 router.post('/:spotId/images', async (req,res) => { // NEED TO REMOVE CREATED AND UPDATED AT
