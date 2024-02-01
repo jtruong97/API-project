@@ -1,8 +1,8 @@
 const express = require('express');
-const { Spot, SpotImage, User, Review, ReviewImage } = require('../../db/models');
+const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { requireAuth } = require('../../utils/auth')
-const { Op } = require('sequelize');
 const { check } = require('express-validator');
+const { Op } = require('sequelize');
 
 const router = express.Router();
 
@@ -344,5 +344,116 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
           })
     }
 })
+
+router.get('/:spotId/bookings', async(req, res) => {
+    let { spotId } = req.params;
+    const currentUserId = req.user.id;
+
+    let spot = await Spot.findByPk(spotId);
+    if(!spot){
+        return res.json({ "message": "Spot couldn't be found" })
+    }
+
+    let bookings = await Booking.findAll({
+        where: {
+            spotId: spotId
+        }
+    })
+
+    for(let booking of bookings){
+        const user = await User.findByPk(currentUserId);
+        if(booking.userId == user.id){ //if you are the owner
+            const response = {
+                User: user,
+                id: booking.id,
+                spotId: booking.spotId,
+                userId: booking.userId,
+                startDate: booking.startDate,
+                endDate: booking.endDate,
+                createdAt: booking.createdAt,
+                updatedAt: booking.updatedAt
+            }
+            return res.json({Bookings: [response]})
+        }
+        else{ //you are not the owner of the spot
+            const response = {
+                spotId: booking.spotId,
+                startDate: booking.startDate,
+                endDate: booking.endDate
+            }
+            return res.json({Bookings: [response]})
+        }
+    }
+})
+
+const validateBooking = [
+    check('startDate')
+    .exists({ checkFalsey: true})
+    .isDate({format: 'YYYY-MM-DD'}),
+    check('endDate')
+    .exists({ checkFalsey: true})
+    .isDate({format: 'YYYY-MM-DD'}),
+]
+
+router.post('/:spotId/bookings', validateBooking, async(req,res) => {
+    const  { spotId } = req.params;
+    let { startDate, endDate } = req.body;
+    let userId = req.user.id;
+
+    try{
+        let spot = await Spot.findByPk(spotId)
+        if(!spot){
+            return res.status(404).json({ "message": "Spot couldn't be found" })
+        }
+        if(spot.ownerId == userId){
+            return res.status(403).json({'message':'You are not allowed to book your own spot'})
+        }
+
+        const booked = await Booking.findOne({ //already booked
+            where:{
+                spotId: spotId,
+                [Op.or]:{
+                    startDate : {
+                        [Op.between] :[ startDate, endDate]
+                    },
+                    endDate: {
+                        [Op.between]: [startDate, endDate]
+                    }
+                }
+            }
+        })
+        if(booked){ //if something is booked
+            return res.status(403).json({
+                "message": "Sorry, this spot is already booked for the specified dates",
+                "errors": {
+                  "startDate": "Start date conflicts with an existing booking",
+                  "endDate": "End date conflicts with an existing booking"
+                }
+              })
+        }
+
+        let newBooking = await Booking.create({ userId: userId, spotId: spotId, startDate, endDate })
+        const response = {
+            id: newBooking.id,
+            spotId: newBooking.spotId,
+            userId: newBooking.userId,
+            startDate: newBooking.startDate,
+            endDate: newBooking.endDate,
+            createdAt: newBooking.createdAt,
+            updatedAt: newBooking.updatedAt
+        }
+        return res.json(response)
+    }
+    catch(error){
+        return res.status(400).json({
+            "message": "Bad Request",
+            "errors": {
+              "startDate": "startDate cannot be in the past",
+              "endDate": "endDate cannot be on or before startDate"
+            }
+          })
+    }
+})
+
 
 module.exports = router;
