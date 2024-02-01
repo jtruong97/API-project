@@ -51,28 +51,64 @@ router.get('/current', async (req,res) => {
     }
 })
 
+router.post('/:reviewId/images', async (req,res) => {
+    let { reviewId } = req.params;
+    let userId = req.user.id;
+    let { url, preview } = req.body;
 
+    let review = await Review.findByPk(reviewId);
+    if(!review){
+        return res.status(404).json({"message": "Review couldn't be found"})
+    }
+    let imgCount = await ReviewImage.count({
+        where: {
+            reviewId : reviewId
+        }
+    })
+    if(imgCount >= 10){
+        return res.status(403).json({ "message": "Maximum number of images for this resource was reached" })
+    }
+
+    let newImg = await ReviewImage.create({ reviewId: reviewId, url, preview });
+
+    let response = {
+        id: newImg.id,
+        url: newImg.url
+    }
+    return res.json(response);
+})
 const validateReview = [
-check('review')
-    .exists({ checkFalsy: true })
-    .withMessage('Review text is required'),
-check('stars')
-    .exists({ checkFalsy: true })
-    .isInt({ min: 1, max: 5})
-    .withMessage('Stars must be an integer from 1 to 5')
-]
+    check('review')
+        .exists({ checkFalsy: true })
+        .withMessage('Review text is required'),
+    check('stars')
+        .exists({ checkFalsy: true })
+        .isInt({ min: 1, max: 5})
+        .withMessage('Stars must be an integer from 1 to 5')
+    ]
 
-router.post('/:spotId/reviews', validateReview, async (req, res) => {
-    const { spotId } = req.params; //destructure the spotId
-    let { review, stars } = req.body
+router.put('/:reviewId', validateReview, async (req, res) => {
     try{
-        let spot = await Spot.findByPk(spotId);
-        let newReview = await Review.create({ review, stars });
+        let { reviewId } = req.params;
+        let userId = req.user.id;
+        let { review, stars } = req.body;
 
-        res.json(newReview);
+        let rev = await Review.findByPk(reviewId);
+        if(!rev){
+            return res.status(404).json({"message": "Review couldn't be found"})
+        }
+        if(rev.userId !== userId){
+            return res.status(400).json({'message': 'This review must belong to the current user'})
+        }
+
+        rev.review = review || rev.review;
+        rev.stars = stars || rev.stars;
+
+        await rev.save();
+        return res.json(rev)
     }
     catch(error){
-        return res.status(404).json({
+        return res.status(400).json({
             "message": "Bad Request",
             "errors": {
               "review": "Review text is required",
@@ -80,6 +116,22 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
             }
           })
     }
+})
+
+router.delete('/:reviewId', async (req,res) => {
+    let { reviewId } = req.params;
+    let review = await Review.findByPk(reviewId);
+    let userId = req.user.id;
+
+    if(!review){
+        return res.status(404).json({ "message": "Review couldn't be found"})
+    }
+    if(review.userId !== userId){
+        return res.status(400).json({'message':'This review must belong to the current user'})
+    }
+
+   await review.destroy();
+   return res.json({ "message": "Successfully deleted" })
 })
 
 module.exports = router;

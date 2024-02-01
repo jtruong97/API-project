@@ -209,7 +209,7 @@ router.put('/:spotId', validateSpot, async (req,res) => {
         let userId = req.user.id;
         let { address, city, state, country, lat, lng, name, description, price } = req.body;
         if(!spot){
-            return res.status(400).json({"message": "Spot couldn't be found"})
+            return res.status(404).json({"message": "Spot couldn't be found"})
         }
         if(spot.ownerId !== userId){
             return res.status(400).json({'message':'This spot must belong to the current user'})
@@ -298,6 +298,50 @@ router.get('/:spotId/reviews', async (req,res) => {
             ReviewImages: reviewimg
         }
         return res.json({Reviews: [response]})
+    }
+})
+
+const validateReview = [
+    check('review')
+        .exists({ checkFalsy: true })
+        .withMessage('Review text is required'),
+    check('stars')
+        .exists({ checkFalsy: true })
+        .isInt({ min: 1, max: 5})
+        .withMessage('Stars must be an integer from 1 to 5')
+    ]
+
+router.post('/:spotId/reviews', validateReview, async (req, res) => {
+    const { spotId } = req.params; //destructure the spotId
+    let { review, stars } = req.body
+    let userId = req.user.id;
+
+    try{
+        let spot = await Spot.findByPk(spotId);
+        if(!spot){
+            return res.status(404).json({"message": "Spot couldn't be found"})
+        }
+        let newReview = await Review.create({ userId: userId, spotId: spotId, review, stars });
+
+        const response = {
+            id: newReview.id,
+            userId : newReview.userId,
+            spotId: newReview.spotId,
+            review: newReview.review,
+            stars: newReview.stars,
+            createdAt: newReview.createdAt,
+            updatedAt: newReview.updatedAt
+        }
+        return res.json(response);
+    }
+    catch(error){
+        return res.status(404).json({
+            "message": "Bad Request",
+            "errors": {
+              "review": "Review text is required",
+              "stars": "Stars must be an integer from 1 to 5",
+            }
+          })
     }
 })
 
