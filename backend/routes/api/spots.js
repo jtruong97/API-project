@@ -2,12 +2,95 @@ const express = require('express');
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { requireAuth } = require('../../utils/auth')
 const { Op } = require('sequelize');
-const { check } = require('express-validator');
+const { check, validationResult, query } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-router.get('/', async (req,res) => { //
-    const spots = await Spot.findAll()
+//PAGINATION
+const validatePag = [
+    query('page')
+        .optional({ checkFalsey: true })
+        .isInt({min:1, max:10})
+        .withMessage("Page must be greater than or equal to 1 and less than 10"),
+    query('size')
+        .optional({ checkFalsey: true })
+        .isInt({min:1, max:20})
+        .withMessage("Size must be greater than or equal to 1 and less than 20"),
+    query('minLat')
+        .isFloat({min: -90, max: 90})
+        .optional({checkFalsey : true})
+        .withMessage("Minimum latitude is invalid"),
+    query('maxLat')
+        .isFloat({min: -90, max: 90})
+        .optional({checkFalsey : true})
+        .withMessage("Maximum latitude is invalid"),
+    query('minLng')
+        .isFloat({min:-180, max:180})
+        .optional({checkFalsey : true})
+        .withMessage("Maximum longitude is invalid"),
+    query('maxLng')
+        .isFloat({min:-180, max:180})
+        .optional({checkFalsey : true})
+        .withMessage("Minimum longitude is invalid"),
+    query('minPrice')
+        .isFloat({min:0})
+        .optional({checkFalsey : true})
+        .isCurrency({allow_negatives: false})
+        .withMessage("Minimum price must be greater than or equal to 0"),
+    query('maxPrice')
+        .isFloat({min: 0})
+        .optional({checkFalsey : true})
+        .isCurrency({allow_negatives: false})
+        .withMessage("Maximum price must be greater than or equal to 0"),
+    handleValidationErrors
+    ]
+
+router.get('/', validatePag, async (req,res) => {
+
+    let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+    let queryObj = {
+        where: {}
+    }
+
+    if(!page || (parseInt(page) == NaN)) page = 1;
+    if(!size || (parseInt(size) == NaN)) size = 20;
+
+    queryObj.limit = size;
+    queryObj.offset = size * (page - 1);
+
+    if(minLat){
+        queryObj.where.lat = {
+            [Op.gte]: parseFloat(minLat)
+        }
+    }
+    if(maxLat){
+        queryObj.where.lat = {
+            [Op.lte]: parseFloat(maxLat)
+        }
+    }
+    if(minLng){
+        queryObj.where.lng = {
+            [Op.gte]: parseFloat(minLng)
+        }
+    }
+    if(maxLng){
+        queryObj.where.lng = {
+            [Op.lte]: parseFloat(maxLng)
+        }
+    }
+    if(minPrice){
+        queryObj.where.price = {
+            [Op.gte]: parseFloat(minPrice)
+        }
+    }
+    if(maxPrice){
+        queryObj.where.price = {
+            [Op.lte] : parseFloat(maxPrice)
+        }
+    }
+
+    const spots = await Spot.findAll({...queryObj})
     let spotArr = []
     for(let spot of spots){
         const reviews = await Review.findAll({
@@ -53,7 +136,9 @@ router.get('/', async (req,res) => { //
         }
         spotArr.push(response)
     }
-    return res.status(200).json({Spots: spotArr})
+    page = parseInt(page)
+    size = parseInt(size)
+    return res.status(200).json({Spots: spotArr, page:page, size: size})
 })
 
 router.get('/current', async (req, res) => { //get all spots owned by the current user
@@ -196,7 +281,8 @@ check('description')
 check('price')
     .exists({ checkFalsey: true })
     .isCurrency({ allow_negatives: false })
-    .withMessage('Price per day must be a positive number')
+    .withMessage('Price per day must be a positive number'),
+handleValidationErrors
 ];
 
 router.post('/', validateSpot, async (req,res) => { //create a spot
@@ -384,7 +470,8 @@ const validateReview = [
     check('stars')
         .exists({ checkFalsy: true })
         .isInt({ min: 1, max: 5})
-        .withMessage('Stars must be an integer from 1 to 5')
+        .withMessage('Stars must be an integer from 1 to 5'),
+    handleValidationErrors
     ]
 
 router.post('/:spotId/reviews', validateReview, async (req, res) => {
@@ -428,7 +515,7 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
     }
 })
 //BOOKING
-router.get('/:spotId/bookings', async(req, res) => {
+router.get('/:spotId/bookings',async(req, res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
 
@@ -470,12 +557,13 @@ router.get('/:spotId/bookings', async(req, res) => {
 })
 
 const validateBooking = [
-    check('startDate')
+check('startDate')
     .exists({ checkFalsey: true})
     .isDate({format: 'YYYY-MM-DD'}),
-    check('endDate')
+check('endDate')
     .exists({ checkFalsey: true})
     .isDate({format: 'YYYY-MM-DD'}),
+handleValidationErrors
 ]
 
 router.post('/:spotId/bookings', validateBooking, async(req,res) => {
