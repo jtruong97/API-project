@@ -23,7 +23,7 @@ router.delete('/:imageId', async (req,res) => {
     }
 
     await spotImg.destroy();
-    return res.json({ "message": "Successfully deleted" })
+    return res.status(200).json({ "message": "Successfully deleted" })
 })
 
 module.exports = router;

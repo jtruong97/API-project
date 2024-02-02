@@ -47,7 +47,7 @@ router.get('/current', async (req,res) => {
             Spot: spot,
             ReviewImages: reviewImages
         }
-        return res.json({Reviews: [response]})
+        return res.status(200).json({Reviews: [response]})
     }
 })
 
@@ -75,7 +75,7 @@ router.post('/:reviewId/images', async (req,res) => {
         id: newImg.id,
         url: newImg.url
     }
-    return res.json(response);
+    return res.status(200).json(response);
 })
 const validateReview = [
     check('review')
@@ -98,14 +98,14 @@ router.put('/:reviewId', validateReview, async (req, res) => {
             return res.status(404).json({"message": "Review couldn't be found"})
         }
         if(rev.userId !== userId){
-            return res.status(400).json({'message': 'This review must belong to the current user'})
+            return res.status(403).json({'message': 'This review must belong to the current user'})
         }
 
         rev.review = review || rev.review;
         rev.stars = stars || rev.stars;
 
         await rev.save();
-        return res.json(rev)
+        return res.status(200).json(rev)
     }
     catch(error){
         return res.status(400).json({
@@ -127,11 +127,11 @@ router.delete('/:reviewId', async (req,res) => {
         return res.status(404).json({ "message": "Review couldn't be found"})
     }
     if(review.userId !== userId){
-        return res.status(400).json({'message':'This review must belong to the current user'})
+        return res.status(403).json({'message':'This review must belong to the current user'})
     }
 
    await review.destroy();
-   return res.json({ "message": "Successfully deleted" })
+   return res.status(200).json({ "message": "Successfully deleted" })
 })
 
 module.exports = router;
