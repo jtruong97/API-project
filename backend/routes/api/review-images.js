@@ -17,11 +17,11 @@ router.delete('/:imageId', async (req,res) => {
 
     let review = await Review.findByPk(reviewImg.reviewId)
     if(review.userId !== userId){
-        return res.status(400).json({'message':'Cannot delete an image that is not yours'})
+        return res.status(403).json({'message':'Cannot delete an image that is not yours'})
     }
 
     await reviewImg.destroy();
-    return res.json({ "message": "Successfully deleted" })
+    return res.status(200).json({ "message": "Successfully deleted" })
 })
 
 

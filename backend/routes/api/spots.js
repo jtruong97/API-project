@@ -53,7 +53,7 @@ router.get('/', async (req,res) => { //
         }
         spotArr.push(response)
     }
-    return res.json({Spots: spotArr})
+    return res.status(200).json({Spots: spotArr})
 })
 
 router.get('/current', async (req, res) => { //get all spots owned by the current user
@@ -104,7 +104,7 @@ router.get('/current', async (req, res) => { //get all spots owned by the curren
             avgRating: spot.dataValues.avgRating,
             previewImage : spot.dataValues.previewImage
         }
-        return res.json({Spots: [response]})
+        return res.status(200).json({Spots: [response]})
     }
 })
 
@@ -164,7 +164,7 @@ router.get('/:spotId', async (req,res) => {
         SpotImages: spotImgs,
         Owner: owner
     }
-    return res.json(response)
+    return res.status(200).json(response)
 })
 
 const validateSpot = [ //validate spot middleware
@@ -219,7 +219,7 @@ router.post('/', validateSpot, async (req,res) => { //create a spot
             description: newSpot.description,
             price: newSpot.price
         }
-        return res.json(response)
+        return res.status(201).json(response)
     }
     catch(error){
         return res.status(400).json({
@@ -259,7 +259,7 @@ router.post('/:spotId/images', async (req,res) => {
         url: newSpotImg.url,
         preview: newSpotImg.preview
     }
-    return res.json(response)
+    return res.status(200).json(response)
 })
 
 router.put('/:spotId', validateSpot, async (req,res) => {
@@ -301,7 +301,7 @@ router.put('/:spotId', validateSpot, async (req,res) => {
             createdAt: spot.createdAt,
             updatedAt: spot.updatedAt
         }
-        return res.json(response)
+        return res.status(200).json(response)
     }
     catch(error){
         return res.status(400).json({
@@ -334,8 +334,9 @@ router.delete('/:spotId', async (req, res) => {
     }
 
     await spot.destroy();
-    return res.json({ "message": "Successfully deleted" })
+    return res.status(200).json({ "message": "Successfully deleted" })
 })
+
 //REVIEWS
 router.get('/:spotId/reviews', async (req,res) => {
     let { spotId } = req.params;
@@ -343,7 +344,7 @@ router.get('/:spotId/reviews', async (req,res) => {
 
     let spot = await Spot.findByPk(spotId);
     if(!spot){
-        return res.json({ "message": "Spot couldn't be found" })
+        return res.status(404).json({ "message": "Spot couldn't be found" })
     }
 
     let reviews = await Review.findAll({
@@ -372,7 +373,7 @@ router.get('/:spotId/reviews', async (req,res) => {
             User: user,
             ReviewImages: reviewimg
         }
-        return res.json({Reviews: [response]})
+        return res.status(200).json({Reviews: [response]})
     }
 })
 
@@ -396,6 +397,13 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
         if(!spot){
             return res.status(404).json({"message": "Spot couldn't be found"})
         }
+        let findReview = await Review.findOne({
+            where: { spotId, userId },
+          });
+          if (findReview) {
+            return res.status(500).json({ message: "User already has a review for this spot" });
+          }
+
         let newReview = await Review.create({ userId: userId, spotId: spotId, review, stars });
 
         const response = {
@@ -407,10 +415,10 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
             createdAt: newReview.createdAt,
             updatedAt: newReview.updatedAt
         }
-        return res.json(response);
+        return res.status(201).json(response);
     }
     catch(error){
-        return res.status(404).json({
+        return res.status(400).json({
             "message": "Bad Request",
             "errors": {
               "review": "Review text is required",
@@ -426,7 +434,7 @@ router.get('/:spotId/bookings', async(req, res) => {
 
     let spot = await Spot.findByPk(spotId);
     if(!spot){
-        return res.json({ "message": "Spot couldn't be found" })
+        return res.status(404).json({ "message": "Spot couldn't be found" })
     }
 
     let bookings = await Booking.findAll({
@@ -448,7 +456,7 @@ router.get('/:spotId/bookings', async(req, res) => {
                 createdAt: booking.createdAt,
                 updatedAt: booking.updatedAt
             }
-            return res.json({Bookings: [response]})
+            return res.status(200).json({Bookings: [response]})
         }
         else{ //you are not the owner of the spot
             const response = {
@@ -456,7 +464,7 @@ router.get('/:spotId/bookings', async(req, res) => {
                 startDate: booking.startDate,
                 endDate: booking.endDate
             }
-            return res.json({Bookings: [response]})
+            return res.status(200).json({Bookings: [response]})
         }
     }
 })
@@ -517,7 +525,7 @@ router.post('/:spotId/bookings', validateBooking, async(req,res) => {
             createdAt: newBooking.createdAt,
             updatedAt: newBooking.updatedAt
         }
-        return res.json(response)
+        return res.status(200).json(response)
     }
     catch(error){
         return res.status(400).json({

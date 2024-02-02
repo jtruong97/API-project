@@ -39,7 +39,7 @@ router.get('/current', async (req,res) => {
             createdAt: booking.createdAt,
             updatedAt: booking.updatedAt
         }
-        return res.json({Bookings: [response]})
+        return res.status(200).json({Bookings: [response]})
     }
 })
 
@@ -63,9 +63,11 @@ router.put('/:bookingId', validateBooking, async (req,res) => {
             return res.status(404).json({ "message": "Booking couldn't be found" })
         }
         if(booking.userId !== userId){
-            return res.status(400).json({'message':'This booking must be yours to edit'})
+            return res.status(403).json({'message':'This booking must be yours to edit'})
         }
-        //validate that these dates are not already booked! booking conflit
+        //CANNOT EDIT A BOOKING THATS PAST THE END DATE!
+
+        //validate that these dates are not already booked! booking conflict
         const booked = await Booking.findOne({
             where:{
                 spotId: booking.spotId,
@@ -93,7 +95,7 @@ router.put('/:bookingId', validateBooking, async (req,res) => {
         booking.endDate = endDate || booking.endDate;
 
         await booking.save();
-        return res.json(booking);
+        return res.status(200).json(booking);
     }
     catch(error){
         return res.status(400).json({
@@ -115,11 +117,11 @@ router.delete('/:bookingId', async (req,res) => {
         return res.status(404).json({ "message": "Booking couldn't be found"})
     }
     if(booking.userId !== userId){
-        return res.status(400).json({'message':'Must be your booking to delete'})
+        return res.status(403).json({'message':'Must be your booking to delete'})
     }
 
     await booking.destroy();
-    return res.json({ "message": "Successfully deleted"})
+    return res.status(200).json({ "message": "Successfully deleted"})
 })
 
 module.exports = router;
