@@ -1,15 +1,15 @@
 const express = require('express');
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { requireAuth } = require('../../utils/auth')
-const { check } = require('express-validator');
 const { Op } = require('sequelize');
+const { check } = require('express-validator');
 
 const router = express.Router();
 
-router.get('/', async (req,res) => { // get all spots NEED TO REMOVE NAN AVG RATINGS
+router.get('/', async (req,res) => { //
     const spots = await Spot.findAll()
+    let spotArr = []
     for(let spot of spots){
-        console.log('SPOT',spot)
         const reviews = await Review.findAll({
             where: {
                 spotId: spot.id
@@ -20,91 +20,151 @@ router.get('/', async (req,res) => { // get all spots NEED TO REMOVE NAN AVG RAT
         reviews.forEach(review => {
             avgRating += review.stars
         })
-        // if(avgRating == NaN){
-        //     spot.dataValues.avgRating = 0
-        // }
         spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1) //add avgRating into spot obj
+        if(isNaN(avgRating)){
+            spot.dataValues.avgRating = 'No Rating'
+        }
 
         const prevImg = await SpotImage.findOne({
             where: {
                 spotId: spot.id
             }
         })
-        if(prevImg){
-            spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
+        spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
+        if(!prevImg){
+            spot.dataValues.previewImage = 'No Images'
         }
+        const response = {
+            id: spot.id,
+            ownerId: spot.ownerId,
+            address: spot.address,
+            city: spot.city,
+            state: spot.state,
+            country: spot.country,
+            lat: spot.lat,
+            lng: spot.lng,
+            name: spot.name,
+            description: spot.description,
+            price: spot.price,
+            createdAt: spot.createdAt,
+            updatedAt: spot.updatedAt,
+            avgRating: spot.dataValues.avgRating,
+            previewImage : spot.dataValues.previewImage
+        }
+        spotArr.push(response)
     }
-
-    return res.json({spots})
+    return res.json({Spots: spotArr})
 })
 
 router.get('/current', async (req, res) => { //get all spots owned by the current user
     const currentUserId = req.user.id;
-   const spots = await Spot.findAll({
-    where: {
-        ownerId: currentUserId
-    }
-   })
-   for(let spot of spots){
-    const reviews = await Review.findAll({ //find all the views for a specific spotId
+    const spots = await Spot.findAll({
         where: {
-            spotId: spot.id
-        }
-    });
-    let avgRating = 0
-    reviews.forEach(review => {
-        avgRating += review.stars
-    })
-    spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1) //add avgRating into spot obj
-
-    if(isNaN(spot.dataValues.avgRating)){
-        delete spot.dataValues.avgRating
-    }
-
-    const prevImg = await SpotImage.findOne({
-        where: {
-            spotId: spot.id
+            ownerId: currentUserId
         }
     })
-    if(prevImg){
+    for(let spot of spots){
+        const reviews = await Review.findAll({ //find all the views for a specific spotId
+            where: {
+            spotId: spot.id
+            }
+        });
+        let avgRating = 0
+        reviews.forEach(review => {
+            avgRating += review.stars
+        })
+
+        spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1) //add avgRating into spot obj
+        if(isNaN(avgRating) || avgRating === null){
+            spot.dataValues.avgRating = 'No Rating'
+        }
+        const prevImg = await SpotImage.findOne({
+            where: {
+                spotId: spot.id
+            }
+        })
         spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
+        if(!prevImg){
+            spot.dataValues.previewImage = 'No Images'
+        }
+        const response = {
+            id: spot.id,
+            ownerId: spot.ownerId,
+            address: spot.address,
+            city: spot.city,
+            state: spot.state,
+            country: spot.country,
+            lat: spot.lat,
+            lng: spot.lng,
+            name: spot.name,
+            description: spot.description,
+            price: spot.price,
+            createdAt: spot.createdAt,
+            updatedAt: spot.updatedAt,
+            avgRating: spot.dataValues.avgRating,
+            previewImage : spot.dataValues.previewImage
+        }
+        return res.json({Spots: [response]})
     }
-    }
-    return res.json({spots})
 })
 
-router.get('/:spotId', async (req,res) => { //NEED TO ALIAS USER TO OWNER
+router.get('/:spotId', async (req,res) => {
     let { spotId } = req.params;
-    const spot = await Spot.findOne({
-        where:{
-            id: spotId
-        },
-        include: [SpotImage, User]
-    })
+    let spot = await Spot.findByPk(spotId)
 
-    if(!spot){ //if the :spotId doesnt exist
+    if(!spot){
         res.status(404)
-        return res.json({
-            "message": "Spot couldn't be found"
-          })
+        return res.json({ "message": "Spot couldn't be found" })
     }
 
-    const reviews = await Review.findAll({
+    let reviews = await Review.findAll({
         where: {
             spotId: spot.id
         }
     })
+
     spot.dataValues.numReviews = reviews.length
     let avgRating = 0
     reviews.forEach(review => {
         avgRating += review.stars
     })
-    spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1)
-    if(isNaN(spot.dataValues.avgRating)){
-        delete spot.dataValues.avgRating
+    spot.dataValues.avgRating = (avgRating/reviews.length).toFixed(1) //add avgRating into spot obj
+    if(isNaN(avgRating)){
+        spot.dataValues.avgRating = 'No Rating'
     }
 
-    res.json({spot})
+    let spotImgs = await SpotImage.findAll({
+        where: {
+            spotId: spot.id
+        }
+    })
+    let owner = await User.findOne({
+        where: {
+            id : spot.ownerId
+        },
+        attributes: ['id','firstName','lastName']
+    })
+
+    const response = {
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: spot.lat,
+        lng: spot.lng,
+        name: spot.name,
+        description: spot.description,
+        price: spot.price,
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+        numReviews: spot.dataValues.numReviews,
+        avgStarRating: spot.dataValues.avgRating,
+        SpotImages: spotImgs,
+        Owner: owner
+    }
+    return res.json(response)
 })
 
 const validateSpot = [ //validate spot middleware
@@ -142,11 +202,13 @@ check('price')
 router.post('/', validateSpot, async (req,res) => { //create a spot
     try{
         let { address, city, state, country, lat, lng, name, description, price } = req.body; //destructure
-        const userId = req.user.id
+        const currentUserId = req.user.id
 
-        let newSpot = await Spot.create({ ownerId: userId, address, city, state, country, lat, lng, name, description, price })
+        let newSpot = await Spot.create({ ownerId: currentUserId, address, city, state, country, lat, lng, name, description, price })
 
         let response = {
+            id: newSpot.id,
+            ownerId: newSpot.ownerId,
             address: newSpot.address,
             city: newSpot.city,
             state: newSpot.state,
@@ -173,26 +235,24 @@ router.post('/', validateSpot, async (req,res) => { //create a spot
               "description": "Description is required",
               "price": "Price per day must be a positive number"
             }
-          })
+        })
     }
 })
 
-router.post('/:spotId/images', async (req,res) => { // NEED TO REMOVE CREATED AND UPDATED AT
-
-    let { spotId } = req.params;    //destructure the spotId
+router.post('/:spotId/images', async (req,res) => {
+    let { spotId } = req.params;
+    let currentUserId = req.user.id;
     let spot = await Spot.findByPk(spotId);
-    let userId = req.user.id;
 
     if(!spot){
         return res.status(404).json({'message': 'Spot could not be found'})
     }
-    if(spot.ownerId !== userId){
-        return res.status(400).json({'message':'This spot must belong to the current user'})
+    if(spot.ownerId !== currentUserId){
+        return res.status(403).json({'message':'This spot must belong to the current user'})
     }
 
-    let { url, preview } = req.body; //destructure from the body
-    let newSpotImg = await SpotImage.create({ url, preview }) //creates a new image with post input
-    spot.dataValues.previewImage = newSpotImg
+    let { url, preview } = req.body;
+    let newSpotImg = await SpotImage.create({ spotId: spotId ,url, preview })
 
     const response = {
         id: newSpotImg.id,
@@ -204,15 +264,15 @@ router.post('/:spotId/images', async (req,res) => { // NEED TO REMOVE CREATED AN
 
 router.put('/:spotId', validateSpot, async (req,res) => {
     try{
-        let { spotId } = req.params;    //destructure the spotId
-        const spot = await Spot.findByPk(spotId)
-        let userId = req.user.id;
+        let { spotId } = req.params;
+        let currentUserId = req.user.id;
         let { address, city, state, country, lat, lng, name, description, price } = req.body;
+        const spot = await Spot.findByPk(spotId)
         if(!spot){
             return res.status(404).json({"message": "Spot couldn't be found"})
         }
-        if(spot.ownerId !== userId){
-            return res.status(400).json({'message':'This spot must belong to the current user'})
+        if(spot.ownerId !== currentUserId){
+            return res.status(403).json({'message':'This spot must belong to the current user'})
         }
 
         spot.address = address || spot.address;
@@ -226,7 +286,22 @@ router.put('/:spotId', validateSpot, async (req,res) => {
         spot.price = price || spot.price;
 
         await spot.save();
-        return res.json(spot)
+        const response = {
+            id: spot.id,
+            ownerId: spot.ownerId,
+            address: spot.address,
+            city: spot.city,
+            state: spot.state,
+            country: spot.country,
+            lat: spot.lat,
+            lng: spot.lng,
+            name: spot.name,
+            description: spot.description,
+            price: spot.price,
+            createdAt: spot.createdAt,
+            updatedAt: spot.updatedAt
+        }
+        return res.json(response)
     }
     catch(error){
         return res.status(400).json({
@@ -248,20 +323,20 @@ router.put('/:spotId', validateSpot, async (req,res) => {
 
 router.delete('/:spotId', async (req, res) => {
     let { spotId } = req.params;    //destructure the spotId
+    let currentUserId = req.user.id;
     const spot = await Spot.findByPk(spotId)
-    let userId = req.user.id;
 
     if(!spot){
         return res.status(404).json({ "message": "Spot couldn't be found" })
     }
-    if(spot.ownerId !== userId){
-        return res.status(400).json({'message':'This spot must belong to the current user'})
+    if(spot.ownerId !== currentUserId){
+        return res.status(403).json({'message':'This spot must belong to the current user'})
     }
 
     await spot.destroy();
     return res.json({ "message": "Successfully deleted" })
 })
-
+//REVIEWS
 router.get('/:spotId/reviews', async (req,res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
@@ -344,7 +419,7 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
           })
     }
 })
-
+//BOOKING
 router.get('/:spotId/bookings', async(req, res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;

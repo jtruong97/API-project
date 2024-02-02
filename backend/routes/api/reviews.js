@@ -120,8 +120,8 @@ router.put('/:reviewId', validateReview, async (req, res) => {
 
 router.delete('/:reviewId', async (req,res) => {
     let { reviewId } = req.params;
-    let userId = req.user.id;
     let review = await Review.findByPk(reviewId);
+    let userId = req.user.id;
 
     if(!review){
         return res.status(404).json({ "message": "Review couldn't be found"})
