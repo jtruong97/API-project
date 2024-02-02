@@ -353,7 +353,7 @@ router.get('/:spotId/reviews', async (req,res) => {
     if(!spot){
         return res.status(404).json({ "message": "Spot couldn't be found" })
     }
-
+    spotId = parseInt(spotId) //check for hanging
     let reviews = await Review.findAll({
         where: {
             spotId : spotId
