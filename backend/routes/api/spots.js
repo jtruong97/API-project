@@ -30,10 +30,13 @@ router.get('/', async (req,res) => { //
                 spotId: spot.id
             }
         })
-        spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
         if(!prevImg){
             spot.dataValues.previewImage = 'No Images'
         }
+        else{
+            spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
+        }
+
         const response = {
             id: spot.id,
             ownerId: spot.ownerId,
@@ -83,9 +86,11 @@ router.get('/current', async (req, res) => { //get all spots owned by the curren
                 spotId: spot.id
             }
         })
-        spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
         if(!prevImg){
             spot.dataValues.previewImage = 'No Images'
+        }
+        else{
+            spot.dataValues.previewImage = prevImg.url //add previewImage into spot obj
         }
         const response = {
             id: spot.id,
@@ -217,7 +222,9 @@ router.post('/', validateSpot, async (req,res) => { //create a spot
             lng: newSpot.lng,
             name: newSpot.name,
             description: newSpot.description,
-            price: newSpot.price
+            price: newSpot.price,
+            createdAt: newSpot.createdAt,
+            updatedAt: newSpot.updatedAt
         }
         return res.status(201).json(response)
     }
