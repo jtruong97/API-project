@@ -3,17 +3,23 @@ const { Spot, SpotImage, User, Review, ReviewImage } = require('../../db/models'
 const { requireAuth } = require('../../utils/auth')
 const { Op } = require('sequelize');
 const { check } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
 router.get('/current', async (req,res) => {
     const currentUserId = req.user.id;
+    let revArr = [];
 
     const reviews = await Review.findAll({
         where: {
             userId: currentUserId
         }
     })
+    // if(reviews.length === 0){
+    //     return res.json([]);
+    // }
+
     const user = await User.findByPk(currentUserId)
 
     for(let review of reviews){
@@ -34,7 +40,6 @@ router.get('/current', async (req,res) => {
             },
             attributes: ['id','url']
         })
-
         const response = {
             id: review.id,
             userId: review.userId,
@@ -47,8 +52,9 @@ router.get('/current', async (req,res) => {
             Spot: spot,
             ReviewImages: reviewImages
         }
-        return res.status(200).json({Reviews: [response]})
+        revArr.push(response)
     }
+    return res.status(200).json({Reviews: revArr})
 })
 
 router.post('/:reviewId/images', async (req,res) => {
@@ -84,7 +90,8 @@ const validateReview = [
     check('stars')
         .exists({ checkFalsy: true })
         .isInt({ min: 1, max: 5})
-        .withMessage('Stars must be an integer from 1 to 5')
+        .withMessage('Stars must be an integer from 1 to 5'),
+    handleValidationErrors
     ]
 
 router.put('/:reviewId', validateReview, async (req, res) => {

@@ -3,12 +3,14 @@ const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../d
 const { requireAuth } = require('../../utils/auth')
 const { Op } = require('sequelize');
 const { check } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
 
 router.get('/current', async (req,res) => {
     const currentUserId = req.user.id;
+    let bookingArr = [];
 
     let bookings = await Booking.findAll({
         where:{
@@ -39,17 +41,19 @@ router.get('/current', async (req,res) => {
             createdAt: booking.createdAt,
             updatedAt: booking.updatedAt
         }
-        return res.status(200).json({Bookings: [response]})
+        bookingArr.push(response)
     }
+    return res.status(200).json({Bookings: bookingArr})
 })
 
 const validateBooking = [
-    check('startDate')
+check('startDate')
     .exists({ checkFalsey: true})
     .isDate({format: 'YYYY-MM-DD'}),
-    check('endDate')
+check('endDate')
     .exists({ checkFalsey: true})
     .isDate({format: 'YYYY-MM-DD'}),
+handleValidationErrors
 ]
 
 router.put('/:bookingId', validateBooking, async (req,res) => {
@@ -65,7 +69,11 @@ router.put('/:bookingId', validateBooking, async (req,res) => {
         if(booking.userId !== userId){
             return res.status(403).json({'message':'This booking must be yours to edit'})
         }
-        //CANNOT EDIT A BOOKING THATS PAST THE END DATE!
+
+        let today = new Date();
+        if(today >= endDate){
+            return res.status(403).json({ "message": "Past bookings can't be modified" })
+        }
 
         //validate that these dates are not already booked! booking conflict
         const booked = await Booking.findOne({
