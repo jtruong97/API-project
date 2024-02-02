@@ -271,10 +271,10 @@ check('country')
     .exists({ checkFalsey: true })
     .withMessage('Country is required.'),
 check('lat')
-    .isInt({ min: -90, max: 90 })
+    .isFloat({ min: -90, max: 90 })
     .withMessage('Latitude must be within -90 and 90'),
 check('lng')
-    .isInt({ min: -180, max: 180})
+    .isFloat({ min: -180, max: 180})
     .withMessage('Longitude must be within -180 and 180'),
 check('name')
     .exists({ checkFalsey: true })
@@ -285,7 +285,7 @@ check('description')
     .withMessage('Description is required'),
 check('price')
     .exists({ checkFalsey: true })
-    .isCurrency({ allow_negatives: false })
+    .isFloat({ min: 0 })
     .withMessage('Price per day must be a positive number'),
 handleValidationErrors
 ];
