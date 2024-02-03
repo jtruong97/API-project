@@ -146,6 +146,7 @@ router.get('/', validatePag, async (req,res) => {
 
 router.get('/current', async (req, res) => { //get all spots owned by the current user
     const currentUserId = req.user.id;
+    let spotArr = [];
     const spots = await Spot.findAll({
         where: {
             ownerId: currentUserId
@@ -194,8 +195,9 @@ router.get('/current', async (req, res) => { //get all spots owned by the curren
             avgRating: spot.dataValues.avgRating,
             previewImage : spot.dataValues.previewImage
         }
-        return res.status(200).json({Spots: [response]})
+        spotArr.push(response)
     }
+    return res.status(200).json({Spots: spotArr})
 })
 
 router.get('/:spotId', async (req,res) => {
@@ -434,6 +436,7 @@ router.delete('/:spotId', async (req, res) => {
 router.get('/:spotId/reviews', async (req,res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
+    let revArr = []
 
     let spot = await Spot.findByPk(spotId);
     if(!spot){
@@ -445,6 +448,9 @@ router.get('/:spotId/reviews', async (req,res) => {
             spotId : spotId
         }
     })
+    // if(reviews.length === 0){
+    //     return res.json([]);
+    // }
 
     for (let review of reviews) {
         let reviewimg = await ReviewImage.findAll({
@@ -466,8 +472,9 @@ router.get('/:spotId/reviews', async (req,res) => {
             User: user,
             ReviewImages: reviewimg
         }
-        return res.status(200).json({Reviews: [response]})
+        revArr.push(response)
     }
+    return res.status(200).json({Reviews: revArr})
 })
 
 const validateReview = [
@@ -525,6 +532,7 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
 router.get('/:spotId/bookings',async(req, res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
+    let bookingArr = [];
 
     let spot = await Spot.findByPk(spotId);
     if(!spot){
@@ -536,9 +544,13 @@ router.get('/:spotId/bookings',async(req, res) => {
             spotId: spotId
         }
     })
+    // if(bookings == null || !bookings){
+    //     return res.json({Bookings:[]})
+    // }
 
     for(let booking of bookings){
         const user = await User.findByPk(currentUserId);
+
         if(booking.userId == user.id){ //if you are the owner
             const response = {
                 User: user,
@@ -550,7 +562,8 @@ router.get('/:spotId/bookings',async(req, res) => {
                 createdAt: booking.createdAt,
                 updatedAt: booking.updatedAt
             }
-            return res.status(200).json({Bookings: [response]})
+            bookingArr.push(response)
+            //return res.status(200).json({Bookings: [response]})
         }
         else{ //you are not the owner of the spot
             const response = {
@@ -558,9 +571,11 @@ router.get('/:spotId/bookings',async(req, res) => {
                 startDate: booking.startDate,
                 endDate: booking.endDate
             }
-            return res.status(200).json({Bookings: [response]})
+            bookingArr.push(response)
+            //return res.status(200).json({Bookings: [response]})
         }
     }
+    res.status(200).json({Bookings: bookingArr})
 })
 
 const validateBooking = [
