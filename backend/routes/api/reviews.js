@@ -7,7 +7,8 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-router.get('/current', async (req,res) => {
+// GET ALL REVIEWS BASED ON CURRENT USER
+router.get('/current', requireAuth, async (req,res) => {
     const currentUserId = req.user.id;
     let revArr = [];
 
@@ -57,7 +58,8 @@ router.get('/current', async (req,res) => {
     return res.status(200).json({Reviews: revArr})
 })
 
-router.post('/:reviewId/images', async (req,res) => {
+// ADD AN IMAGE TO A REVIEW BASED ON REVIEW ID
+router.post('/:reviewId/images', requireAuth, async (req,res) => {
     let { reviewId } = req.params;
     let userId = req.user.id;
     let { url, preview } = req.body;
@@ -94,7 +96,8 @@ const validateReview = [
     handleValidationErrors
     ]
 
-router.put('/:reviewId', validateReview, async (req, res) => {
+// EDIT A REVIEW
+router.put('/:reviewId', validateReview, requireAuth, async (req, res) => {
     try{
         let { reviewId } = req.params;
         let userId = req.user.id;
@@ -125,7 +128,8 @@ router.put('/:reviewId', validateReview, async (req, res) => {
     }
 })
 
-router.delete('/:reviewId', async (req,res) => {
+// DELETE A REVIEW
+router.delete('/:reviewId', requireAuth, async (req,res) => {
     let { reviewId } = req.params;
     let review = await Review.findByPk(reviewId);
     let userId = req.user.id;

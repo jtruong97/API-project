@@ -7,8 +7,8 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-
-router.get('/current', async (req,res) => {
+// GET ALL BOOKINGS OF CURRENT USER
+router.get('/current', requireAuth, async (req,res) => {
     const currentUserId = req.user.id;
     let bookingArr = [];
 
@@ -46,17 +46,8 @@ router.get('/current', async (req,res) => {
     return res.status(200).json({Bookings: bookingArr})
 })
 
-const validateBooking = [
-check('startDate')
-    .exists({ checkFalsey: true})
-    .isDate({format: 'YYYY-MM-DD'}),
-check('endDate')
-    .exists({ checkFalsey: true})
-    .isDate({format: 'YYYY-MM-DD'}),
-handleValidationErrors
-]
-
-router.put('/:bookingId', validateBooking, async (req,res) => {
+// EDIT A SPECIFIC BOOKING
+router.put('/:bookingId', requireAuth, async (req,res) => {
     try{
         let { bookingId } = req.params;
         let userId = req.user.id;
@@ -71,24 +62,34 @@ router.put('/:bookingId', validateBooking, async (req,res) => {
         }
 
         let today = new Date();
-        if(today >= endDate){
-            return res.status(403).json({ "message": "Past bookings can't be modified" })
+        let editStart = new Date(startDate);
+        let editEnd = new Date(endDate);
+        if(today > editStart){
+            return res.status(403).json({ "message": "startDate cannot be in the past"})
+        }
+        if(editEnd <= editStart){
+            return res.status(400).json({'message': "endDate cannot be on or before startDate"})
+        }
+        if(booking.endDate < today){
+            return res.status(403).json({'message': "Past bookings can't be modified"})
         }
 
         //validate that these dates are not already booked! booking conflict
         const booked = await Booking.findOne({
             where:{
+                id: { [Op.ne]: bookingId },
                 spotId: booking.spotId,
                 [Op.or]:{
                     startDate : {
-                        [Op.between] :[ startDate, endDate]
+                        [Op.between] :[ editStart, editEnd]
                     },
                     endDate: {
-                        [Op.between]: [startDate, endDate]
+                        [Op.between]: [editStart, editEnd]
                     }
                 }
             }
         })
+
         if(booked){
             return res.status(403).json({
                 "message": "Sorry, this spot is already booked for the specified dates",
@@ -116,7 +117,8 @@ router.put('/:bookingId', validateBooking, async (req,res) => {
     }
 })
 
-router.delete('/:bookingId', async (req,res) => {
+// DELETE A BOOKING
+router.delete('/:bookingId', requireAuth, async (req,res) => {
     let { bookingId } = req.params;
     let userId = req.user.id;
     let booking = await Booking.findByPk(bookingId);

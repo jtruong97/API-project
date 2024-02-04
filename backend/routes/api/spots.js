@@ -2,7 +2,7 @@ const express = require('express');
 const { Spot, SpotImage, User, Review, ReviewImage, Booking } = require('../../db/models');
 const { requireAuth } = require('../../utils/auth')
 const { Op } = require('sequelize');
-const { check, validationResult, query } = require('express-validator');
+const { check, query } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
@@ -46,6 +46,7 @@ const validatePag = [
     handleValidationErrors
     ]
 
+// GET ALL SPOTS
 router.get('/', validatePag, async (req,res) => {
 
     let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
@@ -144,7 +145,8 @@ router.get('/', validatePag, async (req,res) => {
     return res.status(200).json({Spots: spotArr, page:page, size: size})
 })
 
-router.get('/current', async (req, res) => { //get all spots owned by the current user
+// GET ALL SPOTS BY CURRENT USER
+router.get('/current', requireAuth, async (req, res) => {
     const currentUserId = req.user.id;
     let spotArr = [];
     const spots = await Spot.findAll({
@@ -200,6 +202,7 @@ router.get('/current', async (req, res) => { //get all spots owned by the curren
     return res.status(200).json({Spots: spotArr})
 })
 
+// GET SPOT BY SPOT ID
 router.get('/:spotId', async (req,res) => {
     let { spotId } = req.params;
     let spot = await Spot.findByPk(spotId)
@@ -292,7 +295,8 @@ check('price')
 handleValidationErrors
 ];
 
-router.post('/', validateSpot, async (req,res) => { //create a spot
+// CREATE A SPOT
+router.post('/', validateSpot, requireAuth, async (req,res) => { //create a spot
     try{
         let { address, city, state, country, lat, lng, name, description, price } = req.body; //destructure
         const currentUserId = req.user.id
@@ -334,7 +338,8 @@ router.post('/', validateSpot, async (req,res) => { //create a spot
     }
 })
 
-router.post('/:spotId/images', async (req,res) => {
+// ADD AN IMAGE TO SPOT BASED ON SPOT ID
+router.post('/:spotId/images', requireAuth, async (req,res) => {
     let { spotId } = req.params;
     let currentUserId = req.user.id;
     let spot = await Spot.findByPk(spotId);
@@ -357,7 +362,8 @@ router.post('/:spotId/images', async (req,res) => {
     return res.status(200).json(response)
 })
 
-router.put('/:spotId', validateSpot, async (req,res) => {
+//EDIT A SPOT
+router.put('/:spotId', validateSpot, requireAuth, async (req,res) => {
     try{
         let { spotId } = req.params;
         let currentUserId = req.user.id;
@@ -416,8 +422,9 @@ router.put('/:spotId', validateSpot, async (req,res) => {
     }
 })
 
-router.delete('/:spotId', async (req, res) => {
-    let { spotId } = req.params;    //destructure the spotId
+// DELETE A SPOT
+router.delete('/:spotId', requireAuth, async (req, res) => {
+    let { spotId } = req.params;
     let currentUserId = req.user.id;
     const spot = await Spot.findByPk(spotId)
 
@@ -432,7 +439,7 @@ router.delete('/:spotId', async (req, res) => {
     return res.status(200).json({ "message": "Successfully deleted" })
 })
 
-//REVIEWS
+//GET ALL REVIEWS BASED ON SPOT ID
 router.get('/:spotId/reviews', async (req,res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
@@ -488,8 +495,9 @@ const validateReview = [
     handleValidationErrors
     ]
 
-router.post('/:spotId/reviews', validateReview, async (req, res) => {
-    const { spotId } = req.params; //destructure the spotId
+//CREATE A REVIEW BASED ON SPOT ID
+router.post('/:spotId/reviews', validateReview, requireAuth, async (req, res) => {
+    const { spotId } = req.params;
     let { review, stars } = req.body
     let userId = req.user.id;
 
@@ -528,8 +536,9 @@ router.post('/:spotId/reviews', validateReview, async (req, res) => {
           })
     }
 })
-//BOOKING
-router.get('/:spotId/bookings',async(req, res) => {
+
+// GET ALL BOOKINGS BASED ON SPOT ID
+router.get('/:spotId/bookings', requireAuth, async(req, res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
     let bookingArr = [];
@@ -578,17 +587,18 @@ router.get('/:spotId/bookings',async(req, res) => {
     res.status(200).json({Bookings: bookingArr})
 })
 
-const validateBooking = [
-check('startDate')
-    .exists({ checkFalsey: true})
-    .isDate({format: 'YYYY-MM-DD'}),
-check('endDate')
-    .exists({ checkFalsey: true})
-    .isDate({format: 'YYYY-MM-DD'}),
-handleValidationErrors
-]
+// const validateBooking = [
+// check('startDate')
+//     .exists({ checkFalsey: true})
+//     .isDate({format: 'YYYY-MM-DD'}),
+// check('endDate')
+//     .exists({ checkFalsey: true})
+//     .isDate({format: 'YYYY-MM-DD'}),
+// handleValidationErrors
+// ]
 
-router.post('/:spotId/bookings', validateBooking, async(req,res) => {
+// CREATE A BOOKING FOR A SPOT
+router.post('/:spotId/bookings', requireAuth, async(req,res) => {
     const  { spotId } = req.params;
     let { startDate, endDate } = req.body;
     let userId = req.user.id;
@@ -602,15 +612,18 @@ router.post('/:spotId/bookings', validateBooking, async(req,res) => {
             return res.status(403).json({'message':'You are not allowed to book your own spot'})
         }
 
+        let newStart = new Date(startDate);
+        let newEnd = new Date(endDate);
+
         const booked = await Booking.findOne({ //already booked
             where:{
                 spotId: spotId,
                 [Op.or]:{
                     startDate : {
-                        [Op.between] :[ startDate, endDate]
+                        [Op.between] :[ newStart, newEnd]
                     },
                     endDate: {
-                        [Op.between]: [startDate, endDate]
+                        [Op.between]: [newStart, newEnd]
                     }
                 }
             }
