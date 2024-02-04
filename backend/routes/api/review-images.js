@@ -6,7 +6,8 @@ const { check } = require('express-validator');
 
 const router = express.Router();
 
-router.delete('/:imageId', async (req,res) => {
+// DELETE A REVIEW IMAGE
+router.delete('/:imageId', requireAuth, async (req,res) => {
     let { imageId } = req.params;
     let userId = req.user.id;
 
