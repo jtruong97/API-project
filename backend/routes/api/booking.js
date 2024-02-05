@@ -75,14 +75,11 @@ router.put('/:bookingId', requireAuth, async (req,res) => {
         where:{
             id: { [Op.ne]: bookingId },
             spotId: booking.spotId,
-            [Op.or]:{
-                startDate : {
-                    [Op.between] :[ editStart, editEnd]
-                },
-                endDate: {
-                    [Op.between]: [editStart, editEnd]
-                }
-            }
+            [Op.or]:[
+                {startDate : {[Op.between] :[ editStart, editEnd]}},
+                {endDate: {[Op.between]: [editStart, editEnd]}},
+                {[Op.and]: [{ startDate: { [Op.lte]: editStart } },{ endDate: { [Op.gte]: editEnd } }]}
+            ]
         }
     })
     if(booked){
@@ -113,7 +110,7 @@ router.delete('/:bookingId', requireAuth, async (req,res) => {
         return res.status(403).json({'message':'Forbidden'})
     }
     let today = new Date();
-    let bookStart = new Date(booked.startDate)
+    let bookStart = new Date(booking.startDate)
     if(today > bookStart){
         return res.status(403).json({ "message": "Bookings that have been started can't be deleted"})
     }
