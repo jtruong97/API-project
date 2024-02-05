@@ -8,39 +8,37 @@ const router = express.Router();
 
 //PAGINATION
 const validatePag = [
-    query('page')
-        .optional({ checkFalsy: true })
+    check('page')
+        .optional()
         .isInt({min:1, max:10})
         .withMessage("Page must be greater than or equal to 1 and less than 10"),
-    query('size')
-        .optional({ checkFalsy: true })
+    check('size')
+        .optional()
         .isInt({min:1, max:20})
         .withMessage("Size must be greater than or equal to 1 and less than 20"),
-    query('minLat')
+    check('minLat')
         .isFloat({min: -90, max: 90})
-        .optional({checkFalsy : true})
+        .optional()
         .withMessage("Minimum latitude is invalid"),
-    query('maxLat')
+    check('maxLat')
         .isFloat({min: -90, max: 90})
-        .optional({checkFalsy : true})
+        .optional()
         .withMessage("Maximum latitude is invalid"),
-    query('minLng')
+    check('minLng')
         .isFloat({min:-180, max:180})
-        .optional({checkFalsy : true})
+        .optional()
         .withMessage("Maximum longitude is invalid"),
-    query('maxLng')
+    check('maxLng')
         .isFloat({min:-180, max:180})
-        .optional({checkFalsy : true})
+        .optional()
         .withMessage("Minimum longitude is invalid"),
-    query('minPrice')
+    check('minPrice')
         .isFloat({min:0})
-        .optional({checkFalsy : true})
-        .isCurrency({allow_negatives: false})
+        .optional()
         .withMessage("Minimum price must be greater than or equal to 0"),
-    query('maxPrice')
+    check('maxPrice')
         .isFloat({min: 0})
-        .optional({checkFalsy : true})
-        .isCurrency({allow_negatives: false})
+        .optional()
         .withMessage("Maximum price must be greater than or equal to 0"),
     handleValidationErrors
     ]
@@ -343,7 +341,7 @@ router.post('/:spotId/images', requireAuth, async (req,res) => {
 })
 
 //EDIT A SPOT
-router.put('/:spotId', validateSpot, requireAuth, async (req,res) => {
+router.put('/:spotId', requireAuth, validateSpot, async (req,res) => {
 
     let { spotId } = req.params;
     let currentUserId = req.user.id;
@@ -403,7 +401,7 @@ router.delete('/:spotId', requireAuth, async (req, res) => {
 })
 
 //GET ALL REVIEWS BASED ON SPOT ID
-router.get('/:spotId/reviews', async (req,res) => {
+router.get('/:spotId/reviews', requireAuth, async (req,res) => {
     let { spotId } = req.params;
     let revArr = []
     spotId = parseInt(spotId)
