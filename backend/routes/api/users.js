@@ -16,7 +16,7 @@ check('firstName')
 check('lastName')
   .exists({ checkFalsey: true})
   .isAlpha()
-  .withMessage('Please provide a valid last name.'),
+  .withMessage('Please provide a valid first name.'),
 check('email')
   .exists({ checkFalsy: true })
   .isEmail()
@@ -43,14 +43,14 @@ router.post(
     async (req, res) => {
       const { email, password, username, firstName, lastName } = req.body;
       const hashedPassword = bcrypt.hashSync(password);
-      const user = await User.create({ email, username, hashedPassword, firstName, lastName });
+      const user = await User.create({ email, firstName, lastName, username, hashedPassword });
 
       const safeUser = {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName
       };
 
       await setTokenCookie(res, safeUser);
