@@ -61,12 +61,15 @@ router.get('/current', requireAuth, async (req,res) => {
 // ADD AN IMAGE TO A REVIEW BASED ON REVIEW ID
 router.post('/:reviewId/images', requireAuth, async (req,res) => {
     let { reviewId } = req.params;
-    let userId = req.user.id;
+    let currentUserId = req.user.id;
     let { url, preview } = req.body;
 
     let review = await Review.findByPk(reviewId);
     if(!review){
         return res.status(404).json({"message": "Review couldn't be found"})
+    }
+    if(review.userId !== currentUserId){
+        return res.status(403).json({"message": "Forbidden"})
     }
     let imgCount = await ReviewImage.count({
         where: {
@@ -98,34 +101,20 @@ const validateReview = [
 
 // EDIT A REVIEW
 router.put('/:reviewId', validateReview, requireAuth, async (req, res) => {
-    try{
-        let { reviewId } = req.params;
-        let userId = req.user.id;
-        let { review, stars } = req.body;
-
-        let rev = await Review.findByPk(reviewId);
-        if(!rev){
-            return res.status(404).json({"message": "Review couldn't be found"})
-        }
-        if(rev.userId !== userId){
-            return res.status(403).json({'message': 'This review must belong to the current user'})
-        }
-
-        rev.review = review || rev.review;
-        rev.stars = stars || rev.stars;
-
-        await rev.save();
-        return res.status(200).json(rev)
+    let { reviewId } = req.params;
+    let userId = req.user.id;
+    let { review, stars } = req.body;
+    let rev = await Review.findByPk(reviewId);
+    if(!rev){
+        return res.status(404).json({"message": "Review couldn't be found"})
     }
-    catch(error){
-        return res.status(400).json({
-            "message": "Bad Request",
-            "errors": {
-              "review": "Review text is required",
-              "stars": "Stars must be an integer from 1 to 5",
-            }
-          })
+    if(rev.userId !== userId){
+        return res.status(403).json({'message': "Forbidden"})
     }
+    rev.review = review || rev.review;
+    rev.stars = stars || rev.stars;
+    await rev.save();
+    return res.status(200).json(rev)
 })
 
 // DELETE A REVIEW
@@ -138,7 +127,7 @@ router.delete('/:reviewId', requireAuth, async (req,res) => {
         return res.status(404).json({ "message": "Review couldn't be found"})
     }
     if(review.userId !== userId){
-        return res.status(403).json({'message':'This review must belong to the current user'})
+        return res.status(403).json({'message': "Forbidden"})
     }
 
    await review.destroy();
