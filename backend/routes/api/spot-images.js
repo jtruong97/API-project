@@ -6,8 +6,8 @@ const { check } = require('express-validator');
 
 const router = express.Router();
 
-
-router.delete('/:imageId', async (req,res) => {
+// DELETE A SPOT IMAGE
+router.delete('/:imageId', requireAuth, async (req,res) => {
     let { imageId } = req.params;
     let userId = req.user.id;
 
@@ -19,7 +19,7 @@ router.delete('/:imageId', async (req,res) => {
     let spot = await Spot.findByPk(spotImg.spotId)
 
     if(spot.ownerId !== userId){
-        return res.status(403).json({'message':'This spot must belong to the current user'})
+        return res.status(403).json({'message':'Forbidden'})
     }
 
     await spotImg.destroy();

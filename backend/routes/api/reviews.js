@@ -3,17 +3,24 @@ const { Spot, SpotImage, User, Review, ReviewImage } = require('../../db/models'
 const { requireAuth } = require('../../utils/auth')
 const { Op } = require('sequelize');
 const { check } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 
-router.get('/current', async (req,res) => {
+// GET ALL REVIEWS BASED ON CURRENT USER
+router.get('/current', requireAuth, async (req,res) => {
     const currentUserId = req.user.id;
+    let revArr = [];
 
     const reviews = await Review.findAll({
         where: {
             userId: currentUserId
         }
     })
+    // if(reviews.length === 0){
+    //     return res.json([]);
+    // }
+
     const user = await User.findByPk(currentUserId)
 
     for(let review of reviews){
@@ -34,7 +41,6 @@ router.get('/current', async (req,res) => {
             },
             attributes: ['id','url']
         })
-
         const response = {
             id: review.id,
             userId: review.userId,
@@ -47,18 +53,23 @@ router.get('/current', async (req,res) => {
             Spot: spot,
             ReviewImages: reviewImages
         }
-        return res.status(200).json({Reviews: [response]})
+        revArr.push(response)
     }
+    return res.status(200).json({Reviews: revArr})
 })
 
-router.post('/:reviewId/images', async (req,res) => {
+// ADD AN IMAGE TO A REVIEW BASED ON REVIEW ID
+router.post('/:reviewId/images', requireAuth, async (req,res) => {
     let { reviewId } = req.params;
-    let userId = req.user.id;
+    let currentUserId = req.user.id;
     let { url, preview } = req.body;
 
     let review = await Review.findByPk(reviewId);
     if(!review){
         return res.status(404).json({"message": "Review couldn't be found"})
+    }
+    if(review.userId !== currentUserId){
+        return res.status(403).json({"message": "Forbidden"})
     }
     let imgCount = await ReviewImage.count({
         where: {
@@ -84,41 +95,30 @@ const validateReview = [
     check('stars')
         .exists({ checkFalsy: true })
         .isInt({ min: 1, max: 5})
-        .withMessage('Stars must be an integer from 1 to 5')
+        .withMessage('Stars must be an integer from 1 to 5'),
+    handleValidationErrors
     ]
 
-router.put('/:reviewId', validateReview, async (req, res) => {
-    try{
-        let { reviewId } = req.params;
-        let userId = req.user.id;
-        let { review, stars } = req.body;
-
-        let rev = await Review.findByPk(reviewId);
-        if(!rev){
-            return res.status(404).json({"message": "Review couldn't be found"})
-        }
-        if(rev.userId !== userId){
-            return res.status(403).json({'message': 'This review must belong to the current user'})
-        }
-
-        rev.review = review || rev.review;
-        rev.stars = stars || rev.stars;
-
-        await rev.save();
-        return res.status(200).json(rev)
+// EDIT A REVIEW
+router.put('/:reviewId', validateReview, requireAuth, async (req, res) => {
+    let { reviewId } = req.params;
+    let userId = req.user.id;
+    let { review, stars } = req.body;
+    let rev = await Review.findByPk(reviewId);
+    if(!rev){
+        return res.status(404).json({"message": "Review couldn't be found"})
     }
-    catch(error){
-        return res.status(400).json({
-            "message": "Bad Request",
-            "errors": {
-              "review": "Review text is required",
-              "stars": "Stars must be an integer from 1 to 5",
-            }
-          })
+    if(rev.userId !== userId){
+        return res.status(403).json({'message': "Forbidden"})
     }
+    rev.review = review || rev.review;
+    rev.stars = stars || rev.stars;
+    await rev.save();
+    return res.status(200).json(rev)
 })
 
-router.delete('/:reviewId', async (req,res) => {
+// DELETE A REVIEW
+router.delete('/:reviewId', requireAuth, async (req,res) => {
     let { reviewId } = req.params;
     let review = await Review.findByPk(reviewId);
     let userId = req.user.id;
@@ -127,7 +127,7 @@ router.delete('/:reviewId', async (req,res) => {
         return res.status(404).json({ "message": "Review couldn't be found"})
     }
     if(review.userId !== userId){
-        return res.status(403).json({'message':'This review must belong to the current user'})
+        return res.status(403).json({'message': "Forbidden"})
     }
 
    await review.destroy();

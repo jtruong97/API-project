@@ -6,7 +6,8 @@ const { check } = require('express-validator');
 
 const router = express.Router();
 
-router.delete('/:imageId', async (req,res) => {
+// DELETE A REVIEW IMAGE
+router.delete('/:imageId', requireAuth, async (req,res) => {
     let { imageId } = req.params;
     let userId = req.user.id;
 
@@ -17,7 +18,7 @@ router.delete('/:imageId', async (req,res) => {
 
     let review = await Review.findByPk(reviewImg.reviewId)
     if(review.userId !== userId){
-        return res.status(403).json({'message':'Cannot delete an image that is not yours'})
+        return res.status(403).json({'message':'Forbidden'})
     }
 
     await reviewImg.destroy();
