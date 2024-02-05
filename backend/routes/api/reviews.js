@@ -41,7 +41,7 @@ router.get('/current', requireAuth, async (req,res) => {
         else{
             spot.dataValues.previewImage = spotImages.url
         }
-        
+
         const reviewImages = await ReviewImage.findAll({
             where: {
                 reviewId: review.id
@@ -107,7 +107,7 @@ const validateReview = [
     ]
 
 // EDIT A REVIEW
-router.put('/:reviewId', validateReview, requireAuth, async (req, res) => {
+router.put('/:reviewId', requireAuth, validateReview, async (req, res) => {
     let { reviewId } = req.params;
     let userId = req.user.id;
     let { review, stars } = req.body;
