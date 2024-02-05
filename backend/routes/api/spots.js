@@ -454,7 +454,7 @@ const validateReview = [
     ]
 
 //CREATE A REVIEW BASED ON SPOT ID
-router.post('/:spotId/reviews', validateReview, requireAuth, async (req, res) => {
+router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res) => {
     const { spotId } = req.params;
     let { review, stars } = req.body
     let userId = req.user.id;
@@ -527,15 +527,6 @@ router.get('/:spotId/bookings', requireAuth, async(req, res) => {
     res.status(200).json({Bookings: bookingArr})
 })
 
-// const validateBooking = [
-// check('startDate')
-//     .exists({ checkFalsy: true})
-//     .isDate({format: 'YYYY-MM-DD'}),
-// check('endDate')
-//     .exists({ checkFalsy: true})
-//     .isDate({format: 'YYYY-MM-DD'}),
-// handleValidationErrors
-// ]
 
 // CREATE A BOOKING FOR A SPOT
 router.post('/:spotId/bookings', requireAuth, async(req,res) => {
