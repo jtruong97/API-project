@@ -70,7 +70,7 @@ router.put('/:bookingId', requireAuth, async (req,res) => {
     if(booking.endDate < today){
         return res.status(403).json({'message': "Past bookings can't be modified"})
     }
-    //validate that these dates are not already booked! booking conflict
+
     const booked = await Booking.findOne({
         where:{
             id: { [Op.ne]: bookingId },
@@ -113,7 +113,7 @@ router.delete('/:bookingId', requireAuth, async (req,res) => {
         return res.status(403).json({'message':'Forbidden'})
     }
     let today = new Date();
-    if(booking.startDate < today){// EDIT
+    if(booking.dataValues.startDate < today){
         return res.status(403).json({ "message": "Bookings that have been started can't be deleted"})
     }
 
