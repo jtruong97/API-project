@@ -17,9 +17,9 @@ router.get('/current', requireAuth, async (req,res) => {
             userId: currentUserId
         }
     })
-    // if(reviews.length === 0){
-    //     return res.json([]);
-    // }
+    if(!reviews){
+        return res.json({Review:[]});
+    }
 
     const user = await User.findByPk(currentUserId)
 
@@ -33,8 +33,15 @@ router.get('/current', requireAuth, async (req,res) => {
                 spotId: review.spotId
             }
         })
-        spot.dataValues.previewImage = spotImages.url
+        //spot.dataValues.previewImage = spotImages.url
 
+        if(!spotImages){
+            spot.dataValues.previewImage = 'No Images'
+        }
+        else{
+            spot.dataValues.previewImage = spotImages.url
+        }
+        
         const reviewImages = await ReviewImage.findAll({
             where: {
                 reviewId: review.id
