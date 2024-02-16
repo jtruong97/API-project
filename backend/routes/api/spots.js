@@ -486,45 +486,34 @@ router.post('/:spotId/reviews', requireAuth, validateReview, async (req, res) =>
 router.get('/:spotId/bookings', requireAuth, async(req, res) => {
     let { spotId } = req.params;
     const currentUserId = req.user.id;
-    let bookingArr = [];
 
     let spot = await Spot.findByPk(spotId);
     if(!spot){
         return res.status(404).json({ "message": "Spot couldn't be found" })
     }
 
-    let bookings = await Booking.findAll({
-        where: {
-            spotId: spotId
-        }
-    })
-
-    for(let booking of bookings){
-        const user = await User.findByPk(currentUserId);
-
-        if(booking.userId == user.id){ //if you are the owner
-            const response = {
-                User: user,
-                id: booking.id,
-                spotId: booking.spotId,
-                userId: booking.userId,
-                startDate: booking.startDate,
-                endDate: booking.endDate,
-                createdAt: booking.createdAt,
-                updatedAt: booking.updatedAt
-            }
-            bookingArr.push(response)
-        }
-        else{ //you are not the owner of the spot
-            const response = {
-                spotId: booking.spotId,
-                startDate: booking.startDate,
-                endDate: booking.endDate
-            }
-            bookingArr.push(response)
-        }
+    if(spot.ownerId !== currentUserId){ //you are NOT the owner of the spot
+        let notOwner = await Booking.findAll({
+            where: {
+                spotId: spot.id
+            },
+            attributes: ['spotId', 'startDate', 'endDate']
+        })
+        res.status(200).json({Bookings: notOwner})
     }
-    res.status(200).json({Bookings: bookingArr})
+
+    if(spot.ownerId === currentUserId){ // you ARE the owner of the spot
+        let isOwner = await Booking.findAll({
+            where: {
+                spotId: spot.id
+            },
+            include: [{
+                model: User,
+                attributes: ['id','firstName','lastName']
+            }]
+        })
+        res.status(200).json({Bookings: isOwner})
+    }
 })
 
 
