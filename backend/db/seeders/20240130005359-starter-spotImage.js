@@ -20,18 +20,67 @@ module.exports = {
     */
     await SpotImage.bulkCreate([
       {
-        spotId: 1,
-        url:'https://media.istockphoto.com/id/1318936929/photo/modern-luxurious-villa-with-garden.jpg?s=1024x1024&w=is&k=20&c=o4-4QSVjVvw9Eo_WDLRieGKdqqoSaqG66sFQaiohR6k=',
+        spotId:1,
+        url:'https://i.postimg.cc/sxfJzP4c/spring-front.jpg',
         preview: true
       },
       {
-        spotId: 3,
-        url:'https://media.istockphoto.com/id/1457567236/photo/modern-villa-exterior-with-air-heat-pumps-in-garden.jpg?s=1024x1024&w=is&k=20&c=abfDUS3MAhrz8leVWpPF-OkBjf4oxAFQzN991U_Loo0=',
+        spotId: 1,
+        url:'https://i.postimg.cc/NGb3HpSQ/pink-farm-outside.jpg',
+        preview: true
+      },
+      {
+        spotId:1,
+        url:'https://i.postimg.cc/CxfM73pG/pink-inside.jpg',
+        preview: true
+      },
+      {
+        spotId: 2,
+        url:'https://i.postimg.cc/nLTdzYHC/Screenshot-2024-02-17-at-6-59-43-PM.png',
         preview: false
       },
       {
         spotId: 2,
-        url:'https://media.istockphoto.com/id/1026205392/photo/beautiful-luxury-home-exterior-at-twilight.jpg?s=1024x1024&w=is&k=20&c=_s4AQ2-vNONUaMT0izUGe_ykG3sg__QeUkvFaqu8jnc=',
+        url:'https://i.postimg.cc/gJW6ff9h/beach-interior-2.webp',
+        preview: true
+      },
+      {
+        spotId: 2,
+        url:'https://i.postimg.cc/vZxgDQb9/beach-interior.jpg',
+        preview: true
+      },{
+        spotId: 3,
+        url:'https://i.postimg.cc/vZgNHSTT/IMG-9232.jpg',
+        preview: true
+      },
+      {
+        spotId: 4,
+        url: 'https://i.postimg.cc/J0x81YTt/IMG-9237.jpg',
+        preview: true
+      },
+      {
+        spotId: 5,
+        url: 'https://i.postimg.cc/Hs8318V1/IMG-9233.jpg',
+        preview: true
+      },
+      {
+        spotId: 6,
+        url: 'https://i.postimg.cc/htq8FCkV/nightmarket-home-copy.jpg',
+        preview: true
+      },
+      {
+        spotId: 7,
+        url:'https://i.postimg.cc/PJdx6L3D/IMG-9239.jpg',
+        preview: true
+      },
+      {
+        spotId: 8,
+        url:'https://i.postimg.cc/NFV0QNG6/IMG-9229.jpg',
+        preview: true
+      },
+      {
+        spotId: 9,
+        url:'https://i.postimg.cc/LsWcxhDs/greenhouse.jpg',
         preview: true
       }
     ])
@@ -47,9 +96,21 @@ module.exports = {
     options.tableName = 'SpotImages';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      url: { [Op.in]: ['https://media.istockphoto.com/id/1318936929/photo/modern-luxurious-villa-with-garden.jpg?s=1024x1024&w=is&k=20&c=o4-4QSVjVvw9Eo_WDLRieGKdqqoSaqG66sFQaiohR6k=',
-      'https://media.istockphoto.com/id/1457567236/photo/modern-villa-exterior-with-air-heat-pumps-in-garden.jpg?s=1024x1024&w=is&k=20&c=abfDUS3MAhrz8leVWpPF-OkBjf4oxAFQzN991U_Loo0=',
-      'https://media.istockphoto.com/id/1026205392/photo/beautiful-luxury-home-exterior-at-twilight.jpg?s=1024x1024&w=is&k=20&c=_s4AQ2-vNONUaMT0izUGe_ykG3sg__QeUkvFaqu8jnc='] }
+      url: { [Op.in]: [
+        'https://i.postimg.cc/sxfJzP4c/spring-front.jpg',
+        'https://i.postimg.cc/NGb3HpSQ/pink-farm-outside.jpg',
+        'https://i.postimg.cc/CxfM73pG/pink-inside.jpg',
+        'https://i.postimg.cc/nLTdzYHC/Screenshot-2024-02-17-at-6-59-43-PM.png',
+        'https://i.postimg.cc/gJW6ff9h/beach-interior-2.webp',
+        'https://i.postimg.cc/vZxgDQb9/beach-interior.jpg',
+        'https://i.postimg.cc/vZgNHSTT/IMG-9232.jpg',
+        'https://i.postimg.cc/J0x81YTt/IMG-9237.jpg',
+        'https://i.postimg.cc/Hs8318V1/IMG-9233.jpg',
+        'https://i.postimg.cc/htq8FCkV/nightmarket-home-copy.jpg',
+        'https://i.postimg.cc/PJdx6L3D/IMG-9239.jpg',
+        'https://i.postimg.cc/NFV0QNG6/IMG-9229.jpg',
+        'https://i.postimg.cc/LsWcxhDs/greenhouse.jpg'
+      ]}
     }, {});
   }
 };
