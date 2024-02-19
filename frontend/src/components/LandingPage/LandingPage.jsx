@@ -12,9 +12,9 @@ const LandingPage = () => {
             if(data && data.Spots) {
                 setSpots(data.Spots);
             }
-            else{
-                console.log('error')
-            }
+            // if(!data.ok){
+            //     throw new Error ('Could not fetch spots')
+            // }
         }
         getSpots();
     },[])

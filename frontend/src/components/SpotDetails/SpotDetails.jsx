@@ -15,28 +15,46 @@ const SpotDetails = () => {
     },[spotId, dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
     const spot = useSelector(state => {
-        console.log('STATE',state)
+        //console.log('STATE',state)
         return state.spotsState.spot
     })
 
-    console.log('SPOT INFO',spot)
+    // console.log('SPOT INFO',spot)
+    if(!spot) { //first render is null so this returns if spot is null
+        return
+    }
 
+    let imgs = spot.SpotImages.filter(image => image.id !== 1) //takes first img out
+    //console.log('IMGS', imgs)
     return (
         <div>
             <h1>{spot.name}</h1>
             <div className='spot-location'>
                 Location: {spot.city}, {spot.state}, {spot.country}
             </div>
-            <div className='spotId-images'>
-                {spot.SpotImages.map(image => (
-                    <img src={`${image.url}`} alt={spot.name} key={spot.id}/>
-                ))}
+            <div className='img-container'>
+                <img className='spotId-large-img'src={`${spot.SpotImages[0].url}`}/>
+                <div className='small-img-container'>
+                    {imgs.map(image => (
+                        <img className='spotId-small-img' src={`${image.url}`} alt={spot.name}/>
+                    ))}
+                </div>
             </div>
-            <div className='spotId-host'>
-                Text: Hosted by {spot.Owner.firstName}, {spot.Owner.lastName}
-            </div>
-            <div className='spot-description'>
-                {spot.description}
+            <div className='below-img-container'>
+                <div className ='host-description-container'>
+                    <div className='spotId-host'>
+                        Hosted by {spot.Owner.firstName}, {spot.Owner.lastName}
+                    </div>
+                    <div className='spot-description'>
+                        {spot.description}
+                    </div>
+                </div>
+                <div className='callout-container'>
+                    <p className='callout-price'>${spot.price} night</p>
+                    <button className='reserve-button'
+                        onClick={() => alert('Feature coming soon')}
+                    >Reserve</button>
+                </div>
             </div>
         </div>
     )
