@@ -6,23 +6,23 @@ import './SpotDetails.css'
 
 const SpotDetails = () => {
     const {spotId} = useParams();
-
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(fetchSpecificSpot(spotId))
-    },[spotId, dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
+    },[dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
     const spot = useSelector(state => { //consumes store context
         //console.log('STATE',state)
-        return state.spotsState.spot
+        return state.spotsState
     })
+    let currSpot = spot[spotId]
 
-    if(!spot) { //first render is null so this returns if spot is null
+    if(!currSpot || !currSpot.SpotImages) { //first render is null so this returns if spot is null
         return
     }
-
-    let newImgArr = [...spot.SpotImages] //copy arr and remove first image
+    let imgarr = [currSpot.SpotImages]
+    let newImgArr = structuredClone(...imgarr) //copy arr and remove first image
     newImgArr.shift()
 
     let rating = parseInt(spot.avgStarRating).toFixed(1)
@@ -31,7 +31,7 @@ const SpotDetails = () => {
     }
 
     let rev ='';
-    let numReview = spot.numReviews
+    let numReview = currSpot.numReviews
     if(numReview == 1){
         rev = `• ${numReview} Review`
     }
@@ -41,34 +41,33 @@ const SpotDetails = () => {
     if(numReview > 1){
         rev = `• ${numReview} Reviews`
     }
-    console.log('SPOT',spot)
-
+    //console.log('imgarr zero', imgarr[0][0].url)
     return (
         <div>
-            <h1>{spot.name}</h1>
+            <h1>{currSpot.name}</h1>
             <div className='spot-location'>
-                Location: {spot.city}, {spot.state}, {spot.country}
+                Location: {currSpot.city}, {currSpot.state}, {currSpot.country}
             </div>
             <div className='img-container'>
-                <img className='spotId-large-img'src={`${spot.SpotImages[0].url}`}/>
+                <img className='spotId-large-img'src={`${imgarr[0][0].url}`}/>
                 <div className='small-img-container'>
                     {newImgArr.length ? newImgArr.map(image => (
-                        <img key={image.id} className='spotId-small-img' src={`${image.url}`} alt={spot.name}/>
+                        <img key={image.id} className='spotId-small-img' src={`${image.url}`} alt={currSpot.name}/>
                     )) : null}
                 </div>
             </div>
             <div className='below-img-container'>
                 <div className ='host-description-container'>
                     <div className='spotId-host'>
-                        Hosted by {spot.Owner.firstName}, {spot.Owner.lastName}
+                        Hosted by {currSpot.Owner.firstName}, {currSpot.Owner.lastName}
                     </div>
                     <div className='spot-description'>
-                        {spot.description}
+                        {currSpot.description}
                     </div>
                 </div>
                 <div className='callout-container'>
                     <div className='price-rating-rev-container'>
-                        <p className='callout-price'>${spot.price} / night</p>
+                        <p className='callout-price'>${currSpot.price} / night</p>
                         <div className='star-rating-container'>
                             <img className='stardrop-img' src='https://i.postimg.cc/D0SVzkzk/image-removebg-preview.png' alt='stardrop'/>
                             <p>{rating} {rev}</p>

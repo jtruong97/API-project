@@ -1,11 +1,11 @@
-import { useDispatch } from "react-redux"
-import { useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { createNewSpot } from "../../store/spots"
 
 
 const CreateSpot = () => {
-    let spot; //={country:'', address:'', city:'', state:'', lat:'', lng:'', description:'', name:'', price:''};
+
     const [country, setCountry] = useState('');
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
@@ -24,9 +24,17 @@ const CreateSpot = () => {
     const dispatch = useDispatch();
     const nav = useNavigate();
 
-    useEffect(()=>{
-        let valObj = {};
+    const onSubmit = async(e) => {
+        let user = useSelector(state => {
+            state.session.user
+        })
 
+        e.preventDefault();
+        console.log({
+            country, address, city, state, lat, lng, description, name, price, previewImage, img1, img2, img3, img4
+        })
+
+        let valObj = {};
         if(country.length == 0){
             valObj.country = 'Country field is required'
         }
@@ -58,23 +66,35 @@ const CreateSpot = () => {
             valObj.prevImg = 'At least 1 image is required'
         }
 
-        setValidate(valObj);
-    },[country, address, city, state, lat, lng, description, name, price, previewImage, img1, img2, img3, img4])
+        let spot = {ownerId: user.id, country, address, city, state, lat, lng, description, name, price}
 
+        let images = [{
+            url: previewImage,
+            preview: true
+        }]
+        let smallImg= [img1,img2,img3,img4]
 
-    const onSubmit = async (e) =>{
-        e.preventDefault();
-        console.log({
-            country, address, city, state, lat, lng, description, name, price, previewImage, img1, img2, img3, img4
+        smallImg.map(url => {
+            if(url){
+                images.push({url, preview: true})
+            }
         })
 
-        if(Object.values(validate).length === 0 ){ //if you have no errors
-            spot = await dispatch(createNewSpot({
-                country, address, city, state, lat, lng, description, name, price, spotImages: [previewImage, img1, img2, img3, img4]
-            })) //*** spotImg arr is 0 ***
+        if(Object.values(valObj).length > 0){ //there are errors
+            setValidate(valObj)
+            return
         }
-        if(!spot) return
-        nav(`/spots/${spot.id}`)
+        else{
+            const newSpot = await dispatch(createNewSpot(spot, images))
+
+            if(newSpot && newSpot.id){
+                nav(`/spots/${newSpot.id}`)
+            }
+            else{
+                console.error('Could not create new spot')
+            }
+        }
+
     }
 
     return(
