@@ -39,7 +39,17 @@ body{
 .spot-location{
     font-weight: bold;
 }
+.rating-container {
+    display: flex;
+    height: 30px;
+}
 
+.stardrop {
+    align-self: center;
+    height: 70%;
+    padding-right: 5px;
+    padding-top: 10px;
+}
 .spot-price{
     padding: 0 15px 0 15px;
     margin: 0;

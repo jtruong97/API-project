@@ -28,13 +28,35 @@
 }
 
 .host-description-container {
-    width: 80%;
+    width: 74%;
 }
 
 .callout-container {
     border: 1px black solid;
     border-radius: 10px;
     padding: 15px;
-    width: 15%;
+    width: 25%;
     text-align: center;
+}
+
+.price-rating-rev-container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.star-rating-container{
+    display: flex;
+    height: 30px;
+}
+
+.stardrop-img{
+    align-self: center;
+    height: 70%;
+    padding-right: 5px;
+    padding-top: 10px;
+}
+
+.star-rating-review {
+    display: flex;
+    height: 30px;
 }
