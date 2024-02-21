@@ -3,17 +3,23 @@ import { deleteExistingSpot } from '../../store/spots';
 import { useModal } from '../../context/Modal';
 import './DeleteSpotModal.css'
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 function DeleteModal({spot}) {
     const dispatch = useDispatch();
     const nav = useNavigate();
     const { closeModal } = useModal();
+    const [spotDeleted, setSpotDeleted] = useState(false);
 
     const deleteSpot = async (e) => {
         e.preventDefault();
         await dispatch(deleteExistingSpot(spot.id))
         .then(closeModal)
-        .then(nav('/spots/current'))
+        .then(setSpotDeleted(true))
+        nav('/spots/current')
+    }
+    if(spotDeleted){
+        return;
     }
 
     return(

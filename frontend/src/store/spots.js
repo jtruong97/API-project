@@ -3,8 +3,7 @@ import { csrfFetch } from "./csrf";
 // types
 const VIEW_ALL_SPOTS = '/spot/allSpots'
 const VIEW_SPOT = '/spot/viewSpot'
-//const CREATE_SPOT = '/spots/createNewSpot'
-//const UPDATE_SPOT = 'spot/updateSpot'
+const UPDATE_SPOT = 'spot/updateSpot'
 const DELETE_SPOT = 'spot/deleteSpot'
 
 //action: view spot by spot id
@@ -22,20 +21,20 @@ const viewSpot = (spot) => {
     }
 }
 
-// const createSpot = (spot) => {
-//     return{
-//         type: CREATE_SPOT,
-//         spot
-//     }
-// }
+const deleteSpot = (spotId) => {
+    return {
+        type: DELETE_SPOT,
+        spotId
+    }
+}
 
 
-// const updateSpot = (spot) => {
-//     return {
-//         type: UPDATE_SPOT,
-//         payload: spot
-//     }
-// }
+const updateSpot = (spot) => {
+    return {
+        type: UPDATE_SPOT,
+        spot
+    }
+}
 
 
 //action creaters
@@ -59,7 +58,6 @@ export const fetchSpecificSpot = (spotId) => async(dispatch) =>{
 
 //create new spot
 export const createNewSpot = (spot) => async(dispatch) => {
-    const {preview} = spot;
     const response = await csrfFetch('/api/spots', {
         method: 'POST',
         body: JSON.stringify(spot)
@@ -72,8 +70,7 @@ export const createNewSpot = (spot) => async(dispatch) => {
             csrfFetch(`/api/spots/${data.id}/images`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    url: img.url,
-                    preview
+                    url: img.url
                 })
             })
         })
@@ -90,25 +87,54 @@ export const deleteExistingSpot = (spotId) => async (dispatch) => {
     })
     if(response.ok){
         const data = await response.json();
-        dispatch(delete(data.spotId))
+        dispatch(deleteSpot(data.spotId))
+    }
+}
+
+//update spot
+export const updateExistingSpot = (spot, spotId) => async (dispatch) => {
+    const response = await csrfFetch(`/api/spots/${spotId}`, {
+        method: 'PUT',
+        body: JSON.stringify(spot)
+    })
+    if(response.ok){
+        const data = await response.json();
+        dispatch(updateSpot(data))
+
+        spot.SpotImages.map(img => {
+            csrfFetch(`/api/spots/${data.id}/images`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    url: img.url
+                })
+            })
+        })
+        return data;
+    }
+    if(!response.ok){
+        console.error('Error, could not update spot')
     }
 }
 
 //reducer
 function spotReducer (state={}, action){
     switch(action.type){
-        case VIEW_ALL_SPOTS:
-            let newState = {}
+        case VIEW_ALL_SPOTS: {
+            const newState = {};
             action.payload.Spots.forEach(spot => {
                 newState[spot.id] = spot
             })
             return newState;
+        }
         case VIEW_SPOT:
             return {...state, [action.spot.id]: action.spot}
-        case DELETE_SPOT:
-            const deletestate = {...state}
+        case DELETE_SPOT:{
+            const deletestate = {...state};
             delete deletestate[action.spotId]
             return deletestate
+        }
+        case UPDATE_SPOT:
+            return {...state, [action.spot.id]:[action.spot]}
         default:
             return state;
     }

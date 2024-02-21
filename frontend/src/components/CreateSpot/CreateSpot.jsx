@@ -1,28 +1,38 @@
 import { useDispatch, useSelector } from "react-redux"
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { createNewSpot } from "../../store/spots"
+import { useNavigate, useParams } from "react-router-dom"
+import { createNewSpot, updateExistingSpot } from "../../store/spots"
 import './CreateSpot.css'
 
 
-const CreateSpot = () => {
-    const [country, setCountry] = useState('');
-    const [address, setAddress] = useState('');
-    const [city, setCity] = useState('');
-    const [state, setState] = useState('');
-    const [lat, setLat] = useState('');
-    const [lng, setLng] = useState('');
-    const [description, setDescription] = useState('');
-    const [name, setName] = useState('');
-    const [price, setPrice] = useState('');
-    const [previewImage, setPreviewImage] = useState('');
-    const [img1, setImg1] = useState('');
-    const [img2, setImg2] = useState('');
-    const [img3, setImg3] = useState('');
-    const [img4, setImg4] = useState('');
+const CreateSpot = ({spot}) => {
+    //console.log('SPOT', spot)
+
+    const [country, setCountry] = useState(''|| spot.country);
+    const [address, setAddress] = useState('' || spot.address);
+    const [city, setCity] = useState('' ||spot.city);
+    const [state, setState] = useState('' || spot.state);
+    const [lat, setLat] = useState('' || spot.lat);
+    const [lng, setLng] = useState('' || spot.lng);
+    const [description, setDescription] = useState('' || spot.description);
+    const [name, setName] = useState('' || spot.name);
+    const [price, setPrice] = useState('' || spot.price);
+    const [previewImage, setPreviewImage] = useState(spot.previewImage || '');
+
+    let imgArr = []
+    if(spot.SpotImages){
+        spot.SpotImages.map((image) => {
+            imgArr.push(image.url)
+        })
+    }
+    const [img1, setImg1] = useState(imgArr[1] || '');
+    const [img2, setImg2] = useState(imgArr[2] || '');
+    const [img3, setImg3] = useState(imgArr[3] || '');
+    const [img4, setImg4] = useState(imgArr[4] || '');
     const [validate, setValidate] = useState({});
     const dispatch = useDispatch();
     const nav = useNavigate();
+    const {spotId} = useParams();
     let currUser = useSelector(state => state.session.user)
     //console.log('USER',currUser.id)
 
@@ -66,6 +76,8 @@ const CreateSpot = () => {
         setValidate(valObj);
     },[country, address, city, state, lat, lng, description, name, price, previewImage])
 
+    if(!spot)return
+    let checkSpot= Object.values(spot)
 
     const onSubmit = async (e) =>{
         e.preventDefault();
@@ -81,19 +93,28 @@ const CreateSpot = () => {
             }
         })
 
-        console.log('IMAGES ARR', images) //shows arr of imgs
+        //console.log('IMAGES ARR', images) //shows arr of imgs
 
-        let spot = {ownerId: currUser, country, address, city, state, lat, lng, description, name, price, SpotImages:images}
-        console.log(spot,'SPOT') //has SpotImages with arr of urls
+        spot = {ownerId: currUser, country, address, city, state, lat, lng, description, name, price, SpotImages:images}
+        //console.log(spot,'SPOT') //has SpotImages with arr of urls
 
         if(Object.values(validate).length){ //if you have no errors
            console.error('Spot coult not be created')
         }
-        let newSpot = await dispatch(createNewSpot(spot))
-        if(newSpot && newSpot.id){
-            nav(`/spots/${newSpot.id}`)
+        if(!checkSpot[0]){ //new spot
+            let newSpot = await dispatch(createNewSpot(spot))
+            if(newSpot && newSpot.id){
+                nav(`/spots/${newSpot.id}`)
+            }
+            if(!newSpot) return
         }
-        if(!newSpot) return
+        if(checkSpot[0]){ //updating
+            let updateSpot = await dispatch(updateExistingSpot(spot, spotId))
+            if(updateSpot && updateSpot.id){
+                nav(`/spots/current`)
+            }
+            if(!updateSpot) return
+        }
     }
 
     return(
@@ -101,7 +122,6 @@ const CreateSpot = () => {
             className='spot-form'
             onSubmit={onSubmit}
         >
-            <h1>Create a new Spot</h1>
             <h2>Where&apos;s your place located?</h2>
             <p>Guests will only get your exact address once they booked a reservation</p>
             <label className='label-container'>
