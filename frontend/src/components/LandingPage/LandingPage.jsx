@@ -1,32 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import SpotTile from './SpotTile';
+import { fetchAllSpots } from '../../store/spots';
 import './LandingPage.css'
 
 const LandingPage = () => {
-    const [spots, setSpots] = useState([]);
+    const dispatch = useDispatch();
+    const spot = useSelector(state => { //returns spot obj with specific id
+        //console.log('STATE',state)
+        return state.spotsState
+    })
+    useEffect(()=>{
+        dispatch(fetchAllSpots())
+    },[dispatch])
 
-    useEffect(()=> {
-        const getSpots = async () => {
-            const response = await fetch ('/api/spots');
-            const data = await response.json();
-            if(data && data.Spots) {
-                setSpots(data.Spots);
-            }
-            // if(!data.ok){
-            //     throw new Error ('Could not fetch spots')
-            // }
-        }
-        getSpots();
-    },[])
-
+    let spotsArr = Object.values(spot)
+    // console.log('SPOT',spot) // obj of spot objs
+    // console.log('SPOTSArr',spotsArr)
     return(
         <div className='tile-container'>
-            {spots.map(spot => (
+             {spotsArr.map(spot => (
                 <SpotTile key={spot.id} spot={spot}/> //passes spot prop
             ))}
         </div>
     )
 }
-
 
 export default LandingPage;

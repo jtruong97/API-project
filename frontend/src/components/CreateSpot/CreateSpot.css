@@ -1,0 +1,54 @@
+
+.spot-form{
+    padding: 0 15% 2% 15%;
+}
+
+.val{
+    color: rgb(191, 8, 8);
+}
+.input-box{
+    border: 2px solid rgb(165, 164, 164);
+    padding: 3px;
+}
+
+.full-input{
+    width: 100%;
+}
+.description-box{
+    width: 100%;
+    padding-bottom: 120px;
+}
+.price-input{
+    width: 95%;
+    margin-left: 6px;
+}
+.url-box{
+    width: 100%;
+    margin-bottom: 12px;
+}
+.name-container{
+    display: flex;
+}
+
+.city-state-container{
+    display: flex;
+}
+.city-container{
+    width: 65%;
+}
+.state-container{
+    width: 34%;
+}
+.city-state-input{
+    width: 95%;
+}
+.create-button{
+    background-color: rgb(136, 175, 175);
+    color: white;
+    width: 20%;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
