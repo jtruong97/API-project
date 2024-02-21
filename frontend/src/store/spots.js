@@ -3,6 +3,7 @@ import { csrfFetch } from "./csrf";
 // types
 const VIEW_ALL_SPOTS = '/spot/allSpots'
 const VIEW_SPOT = '/spot/viewSpot'
+//const CREATE_SPOT = '/spots/createNewSpot'
 //const UPDATE_SPOT = 'spot/updateSpot'
 const DELETE_SPOT = 'spot/deleteSpot'
 
@@ -21,12 +22,13 @@ const viewSpot = (spot) => {
     }
 }
 
-const deleteSpot = (spotId) => {
-    return{
-        type: DELETE_SPOT,
-        spotId
-    }
-}
+// const createSpot = (spot) => {
+//     return{
+//         type: CREATE_SPOT,
+//         spot
+//     }
+// }
+
 
 // const updateSpot = (spot) => {
 //     return {
@@ -57,16 +59,24 @@ export const fetchSpecificSpot = (spotId) => async(dispatch) =>{
 
 //create new spot
 export const createNewSpot = (spot) => async(dispatch) => {
+    const {preview} = spot;
     const response = await csrfFetch('/api/spots', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-            spot
-        })
+        body: JSON.stringify(spot)
     })
     if(response.ok){
         const data = await response.json();
         dispatch(viewSpot(data))
+
+        spot.SpotImages.map(img => {
+            csrfFetch(`/api/spots/${data.id}/images`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    url: img.url,
+                    preview
+                })
+            })
+        })
         return data;
     }
     if(!response.ok){
@@ -95,8 +105,6 @@ function spotReducer (state={}, action){
             return newState;
         case VIEW_SPOT:
             return {...state, [action.spot.id]: action.spot}
-        // case UPDATE_SPOT:
-        //     const updateState= {...state}
         case DELETE_SPOT:
             const deletestate = {...state}
             delete deletestate[action.spotId]

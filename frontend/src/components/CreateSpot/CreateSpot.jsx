@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from "react-redux"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { createNewSpot } from "../../store/spots"
 import './CreateSpot.css'
 
-const CreateSpot = () => {
 
+const CreateSpot = () => {
     const [country, setCountry] = useState('');
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
@@ -14,7 +14,7 @@ const CreateSpot = () => {
     const [lng, setLng] = useState('');
     const [description, setDescription] = useState('');
     const [name, setName] = useState('');
-    const [price, setPrice] = useState(0);
+    const [price, setPrice] = useState('');
     const [previewImage, setPreviewImage] = useState('');
     const [img1, setImg1] = useState('');
     const [img2, setImg2] = useState('');
@@ -23,18 +23,12 @@ const CreateSpot = () => {
     const [validate, setValidate] = useState({});
     const dispatch = useDispatch();
     const nav = useNavigate();
+    let currUser = useSelector(state => state.session.user)
+    //console.log('USER',currUser.id)
 
-    const onSubmit = async(e) => {
-        let user = useSelector(state => {
-            state.session.user
-        })
-
-        e.preventDefault();
-        console.log({
-            country, address, city, state, lat, lng, description, name, price, previewImage, img1, img2, img3, img4
-        })
-
+    useEffect(()=>{
         let valObj = {};
+
         if(country.length == 0){
             valObj.country = 'Country field is required'
         }
@@ -59,42 +53,47 @@ const CreateSpot = () => {
         if(description.length == 0){
             valObj.description = 'Description is required'
         }
-        if(price < 0) {
+        if(price < 0 || !price) {
             valObj.price = 'Price per day must be a positive number'
+        }
+        if(name.length == 0){
+            valObj.name = 'Name is required'
         }
         if(previewImage.length == 0){
             valObj.prevImg = 'At least 1 image is required'
         }
 
-        let spot = {ownerId: user.id, country, address, city, state, lat, lng, description, name, price}
+        setValidate(valObj);
+    },[country, address, city, state, lat, lng, description, name, price, previewImage])
+
+
+    const onSubmit = async (e) =>{
+        e.preventDefault();
 
         let images = [{
             url: previewImage,
             preview: true
         }]
         let smallImg= [img1,img2,img3,img4]
-
         smallImg.map(url => {
             if(url){
-                images.push({url, preview: true})
+                images.push({url:url, preview: true})
             }
         })
 
-        if(Object.values(valObj).length > 0){ //there are errors
-            setValidate(valObj)
-            return
-        }
-        else{
-            const newSpot = await dispatch(createNewSpot(spot, images))
+        console.log('IMAGES ARR', images) //shows arr of imgs
 
-            if(newSpot && newSpot.id){
-                nav(`/spots/${newSpot.id}`)
-            }
-            else{
-                console.error('Could not create new spot')
-            }
-        }
+        let spot = {ownerId: currUser, country, address, city, state, lat, lng, description, name, price, SpotImages:images}
+        console.log(spot,'SPOT') //has SpotImages with arr of urls
 
+        if(Object.values(validate).length){ //if you have no errors
+           console.error('Spot coult not be created')
+        }
+        let newSpot = await dispatch(createNewSpot(spot))
+        if(newSpot && newSpot.id){
+            nav(`/spots/${newSpot.id}`)
+        }
+        if(!newSpot) return
     }
 
     return(
@@ -102,12 +101,16 @@ const CreateSpot = () => {
             className='spot-form'
             onSubmit={onSubmit}
         >
-            <h1>Creat a new Spot</h1>
+            <h1>Create a new Spot</h1>
             <h2>Where&apos;s your place located?</h2>
             <p>Guests will only get your exact address once they booked a reservation</p>
-            <label>
-                Country
+            <label className='label-container'>
+                <div className='name-container'>
+                    Country
+                    {'country' in validate && (<p className='val'>{validate.country}</p>)}
+                </div>
                 <input
+                    className='input-box full-input'
                     type='text'
                     name='country'
                     value={country}
@@ -115,10 +118,13 @@ const CreateSpot = () => {
                     onChange={(e) => setCountry(e.target.value)}
                 />
             </label>
-            {'country' in validate && (<p>{validate.country}</p>)}
-            <label>
-                Street Address
+            <label className='label-container'>
+                <div className="name-container">
+                    Street Address
+                    {'address' in validate && (<p className='val'>{validate.address}</p>)}
+                </div>
                 <input
+                    className='input-box full-input'
                     type='text'
                     name='address'
                     value={address}
@@ -126,56 +132,73 @@ const CreateSpot = () => {
                     onChange={(e) => setAddress(e.target.value)}
                 />
             </label>
-            {'address' in validate && (<p>{validate.address}</p>)}
-            <label>
-                City
-                <input
-                    type='text'
-                    name='city'
-                    value={city}
-                    placeholder="City"
-                    onChange={(e) => setCity(e.target.value)}
-                />
-            </label>
-            {'city' in validate && (<p>{validate.city}</p>)}
-            <label>
-                State
-                <input
-                    type='text'
-                    name='state'
-                    value={state}
-                    placeholder="STATE"
-                    onChange={(e) => setState(e.target.value)}
-                />
-            </label>
-            {'state' in validate && (<p>{validate.state}</p>)}
-            <label>
-                Latitude
-                <input
-                    type='text'
-                    name='latitude'
-                    value={lat}
-                    placeholder="Latitude"
-                    onChange={(e) => setLat(e.target.value)}
-                />
-            </label>
-            {'lat' in validate && (<p>{validate.lat}</p>)}
-            <label>
-                Longitude
-                <input
-                    type='text'
-                    name='longitude'
-                    value={lng}
-                    placeholder="Longitude"
-                    onChange={(e) => setLng(e.target.value)}
-                />
-            </label>
-            {'lng' in validate && (<p>{validate.lng}</p>)}
+            <div className='city-state-container'>
+                <label className='label-container city-container'>
+                    <div className="name-container">
+                        City
+                        {'city' in validate && (<p className='val'>{validate.city}</p>)}
+                    </div>
+                    <input
+                        className="input-box city-state-input"
+                        type='text'
+                        name='city'
+                        value={city}
+                        placeholder="City"
+                        onChange={(e) => setCity(e.target.value)}
+                    />,
+                </label>
+                <label className='label-container state-container'>
+                    <div className="name-container">
+                        State
+                        {'state' in validate && (<p className='val'>{validate.state}</p>)}
+                    </div>
+                    <input
+                        className="input-box city-state-input"
+                        type='text'
+                        name='state'
+                        value={state}
+                        placeholder="STATE"
+                        onChange={(e) => setState(e.target.value)}
+                    />
+                </label>
+            </div>
+            <div className='lat-lng-container lat-lng-box'>
+                <label className='label-container'>
+                    <div className='name-container'>
+                        Latitude
+                        {'lat' in validate && (<p className='val'>{validate.lat}</p>)}
+                    </div>
+                    <input
+                        className="input-box"
+                        type='text'
+                        name='latitude'
+                        value={lat}
+                        placeholder="Latitude"
+                        onChange={(e) => setLat(e.target.value)}
+                    />
+                </label>
+                <label className='label-container'>
+                    <div className="name-container">
+                        Longitude
+                        {'lng' in validate && (<p className='val'>{validate.lng}</p>)}
+                    </div>
+                    <input
+                        className="input-box"
+                        type='text'
+                        name='longitude'
+                        value={lng}
+                        placeholder="Longitude"
+                        onChange={(e) => setLng(e.target.value)}
+                    />
+                </label>
+
+            </div>
             <hr></hr>
             <h2>Describe your place to guests</h2>
             <p>Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood</p>
             <label>
                 <input
+                    className="input-box description-box"
                     type='text'
                     name='description'
                     value={description}
@@ -183,12 +206,13 @@ const CreateSpot = () => {
                     onChange={(e) => setDescription(e.target.value)}
                 />
             </label>
-            {'description' in validate && (<p>{validate.description}</p>)}
+            {'description' in validate && (<p className='val'>{validate.description}</p>)}
             <hr></hr>
             <h2>Create a title for your spot</h2>
             <p>catch guests&apos; attention with a spot title that highlights what makes your place special.</p>
             <label>
                 <input
+                    className="input-box full-input"
                     type='text'
                     name='name'
                     value={name}
@@ -196,13 +220,14 @@ const CreateSpot = () => {
                     onChange={(e) => setName(e.target.value)}
                 />
             </label>
-            {'name' in validate && (<p>{validate.name}</p>)}
+            {'name' in validate && (<p className='val'>{validate.name}</p>)}
             <hr></hr>
             <h2>Set a base price for your spot</h2>
             <p>Competitive pricing can help your listing stand out and rank higher in search results.</p>
             <label>
                 $
                 <input
+                    className="input-box price-input"
                     type='text'
                     name='price'
                     value={price}
@@ -210,12 +235,13 @@ const CreateSpot = () => {
                     onChange={(e) => setPrice(e.target.value)}
                 />
             </label>
-            {'price' in validate && (<p>{validate.price}</p>)}
+            {'price' in validate && (<p className='val'>{validate.price}</p>)}
             <hr></hr>
             <h2>Liven up your spot with photos</h2>
             <p>Submit a link to at least one photo to publish your spot</p>
             <label>
                 <input
+                    className='input-box url-box'
                     type='text'
                     name='previewImage'
                     value={previewImage}
@@ -223,9 +249,10 @@ const CreateSpot = () => {
                     onChange={(e) => setPreviewImage(e.target.value)}
                 />
             </label>
-            {'prevImg' in validate && (<p>{validate.prevImg}</p>)}
-            <label>
+            {'prevImg' in validate && (<p className='val'>{validate.prevImg}</p>)}
+            <label className="img-box">
                 <input
+                    className='input-box url-box'
                     type='text'
                     name='img1'
                     value={img1}
@@ -233,8 +260,9 @@ const CreateSpot = () => {
                     onChange={(e) => setImg1(e.target.value)}
                 />
             </label>
-            <label>
+            <label className="img-box">
                 <input
+                    className='input-box url-box'
                     type='text'
                     name='img2'
                     value={img2}
@@ -242,8 +270,9 @@ const CreateSpot = () => {
                     onChange={(e) => setImg2(e.target.value)}
                 />
             </label>
-            <label>
+            <label className="img-box">
                 <input
+                    className='input-box url-box'
                     type='text'
                     name='img3'
                     value={img3}
@@ -251,8 +280,9 @@ const CreateSpot = () => {
                     onChange={(e) => setImg3(e.target.value)}
                 />
             </label>
-            <label>
+            <label className="img-box">
                 <input
+                    className='input-box url-box'
                     type='text'
                     name='img4'
                     value={img4}
@@ -262,10 +292,13 @@ const CreateSpot = () => {
             </label>
 
            <hr></hr>
-           <button
-            type='submit'
-            disabled={Object.keys(validate).length > 0}
-           >Create Spot</button>
+           <div className='button-container'>
+            <button
+                className='create-button'
+                type='submit'
+                disabled={Object.keys(validate).length > 0}
+            >Create Spot</button>
+           </div>
         </form>
     )
 }

@@ -10,7 +10,7 @@ const SpotDetails = () => {
 
     useEffect(() => {
         dispatch(fetchSpecificSpot(spotId))
-    },[dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
+    },[spotId,dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
     const spot = useSelector(state => { //consumes store context
         //console.log('STATE',state)
