@@ -4,7 +4,7 @@ import { csrfFetch } from "./csrf";
 const VIEW_ALL_SPOTS = '/spot/allSpots'
 const VIEW_SPOT = '/spot/viewSpot'
 //const UPDATE_SPOT = 'spot/updateSpot'
-//const DELETE_SPOT = 'spot/deleteSpot'
+const DELETE_SPOT = 'spot/deleteSpot'
 
 //action: view spot by spot id
 const viewAllSpots = (spots) => {
@@ -21,12 +21,12 @@ const viewSpot = (spot) => {
     }
 }
 
-// const deleteSpot = (spotId) => {
-//     return{
-//         type: DELETE_SPOT,
-//         spotId
-//     }
-// }
+const deleteSpot = (spotId) => {
+    return{
+        type: DELETE_SPOT,
+        spotId
+    }
+}
 
 // const updateSpot = (spot) => {
 //     return {
@@ -74,15 +74,15 @@ export const createNewSpot = (spot) => async(dispatch) => {
     }
 }
 //delete spot
-// export const deleteExistingSpot = (spotId) => async (dispatch) => {
-//     const response = await csrfFetch(`/api/spots/${spotId}`, {
-//         method: 'DELETE'
-//     })
-//     if(response.ok){
-//         const data = await response.json();
-//         dispatch(delete(data.spotId))
-//     }
-// }
+export const deleteExistingSpot = (spotId) => async (dispatch) => {
+    const response = await csrfFetch(`/api/spots/${spotId}`, {
+        method: 'DELETE'
+    })
+    if(response.ok){
+        const data = await response.json();
+        dispatch(delete(data.spotId))
+    }
+}
 
 //reducer
 function spotReducer (state={}, action){
@@ -97,10 +97,10 @@ function spotReducer (state={}, action){
             return {...state, [action.spot.id]: action.spot}
         // case UPDATE_SPOT:
         //     const updateState= {...state}
-        // case DELETE_SPOT:
-        //     const newState = {...state}
-        //     delete newState[action.spotId]
-        //     return newState
+        case DELETE_SPOT:
+            const deletestate = {...state}
+            delete deletestate[action.spotId]
+            return deletestate
         default:
             return state;
     }

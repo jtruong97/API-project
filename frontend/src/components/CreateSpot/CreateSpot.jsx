@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { createNewSpot } from "../../store/spots"
-
+import './CreateSpot.css'
 
 const CreateSpot = () => {
 
