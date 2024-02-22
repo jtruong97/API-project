@@ -433,7 +433,7 @@ router.get('/:spotId/reviews', requireAuth, async (req,res) => {
             review: review.review,
             stars: review.stars,
             createdAt: review.createdAt,
-            uodatedAt: review.updatedAt,
+            updatedAt: review.updatedAt,
             User: user,
             ReviewImages: reviewimg
         }

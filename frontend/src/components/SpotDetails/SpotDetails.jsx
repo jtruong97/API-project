@@ -2,34 +2,44 @@ import { useDispatch, useSelector} from 'react-redux';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchSpecificSpot } from '../../store/spots';
+import { getReviews } from '../../store/reviews';
 import './SpotDetails.css'
 
 const SpotDetails = () => {
     const {spotId} = useParams();
     const dispatch = useDispatch();
+    const spot = useSelector(state => {return state.spotsState})
+    const reviews = useSelector(state => {return state.reviewState})
+    const users = useSelector(state => {return state.session})
 
     useEffect(() => {
         dispatch(fetchSpecificSpot(spotId))
+        dispatch(getReviews(spotId))
     },[spotId,dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
-    const spot = useSelector(state => { //consumes store context
-        //console.log('STATE',state)
-        return state.spotsState
-    })
+    let reviewsArr = Object.values(reviews)
+    console.log('REV ARRAY!',reviewsArr, 'SPOT HERE', spot)
+    if( //rerenders page if none of these exisit
+        !reviewsArr.length ||
+        !reviewsArr.every(rev=>rev.createdAt) ||
+        !spot[spotId] ||
+        !spot[spotId].SpotImages)
+        {
+        return <div>Loading...</div>
+    }
+
     let currSpot = spot[spotId]
 
-    if(!currSpot || !currSpot.SpotImages) { //first render is null so this returns if spot is null
-        return
-    }
     let imgarr = [currSpot.SpotImages]
     let newImgArr = structuredClone(...imgarr) //copy arr and remove first image
     newImgArr.shift()
 
-    let rating = parseInt(spot.avgStarRating).toFixed(1)
+    //rating format
+    let rating = parseInt(currSpot.avgStarRating).toFixed(1)
     if(isNaN(rating)){
         rating = 'New'
     }
-
+    //reviews str format
     let rev ='';
     let numReview = currSpot.numReviews
     if(numReview == 1){
@@ -41,7 +51,26 @@ const SpotDetails = () => {
     if(numReview > 1){
         rev = `• ${numReview} Reviews`
     }
-    //console.log('imgarr zero', imgarr[0][0].url)
+
+    let currRevArr = []
+    if(reviewsArr.length){
+        let revArr = reviewsArr.sort((a,b) => { //sorted array with ALL reviews
+            return new Date(a.createdAt) - new Date(b.createdAt)
+        })
+        revArr.forEach(rev => {
+            let date = (new Date(rev.createdAt)).toDateString()
+            let month = date.slice(4,8)
+            const year = (new Date(rev.createdAt)).getFullYear()
+            rev.newDate = `${month} ${year}`
+        })
+        revArr.map(rev => {
+            if(rev.spotId ===  currSpot.id){
+                currRevArr.push(rev)
+            }
+        })
+    }
+    let userId = users.user ? users.user.id : null
+
     return (
         <div>
             <h1>{currSpot.name}</h1>
@@ -84,6 +113,16 @@ const SpotDetails = () => {
                     <img className='stardrop-img' src='https://i.postimg.cc/D0SVzkzk/image-removebg-preview.png' alt='stardrop'/>
                     <p>{rating} {rev}</p>
                 </div>
+            </div>
+            <div className ='reviews-container'>
+                {currRevArr.map(review => (
+                    <>
+                        <p key={review.id}>{review.User.firstName}</p>
+                        <p>{review.newDate}</p>
+                        <p>{review.review}</p>
+                    </>
+                ))}
+                {currRevArr.length == 0 && users.user &&currSpot.ownerId !== userId && (<p>Be the first to post a review!</p>)}
             </div>
         </div>
     )

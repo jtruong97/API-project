@@ -13,15 +13,15 @@ const ManageSpot = () => {
     const user = useSelector(state => {
         return state.session.user
     })
+    const spots = useSelector(state => {
+     return state.spotsState
+    })
    const userId = user.id;
 
    useEffect(()=> {
     dispatch(fetchAllSpots())
    },[dispatch])
 
-   const spots = useSelector(state => {
-    return state.spotsState
-   })
    let spotArr = Object.values(spots)
    spotArr = spotArr.filter(spot => spot.ownerId == userId) //new Arr with only current owners spots
 
