@@ -49,7 +49,6 @@ const ManageSpot = () => {
                         </div>
                     </NavLink>
                     <div className='update-delete-container'>
-                        {/* <button onClick={navToUpdate}>Update</button> */}
                         <button><NavLink to={`/spots/${spot.id}/edit`}>Update</NavLink></button>
                         <button className='delete-button'>
                             <OpenModalMenuItem

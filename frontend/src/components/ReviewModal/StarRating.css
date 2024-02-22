@@ -1,0 +1,10 @@
+.filled {
+    color: red;
+}
+
+.filled:hover{
+    color: red;
+}
+.empty {
+    color: grey;
+}

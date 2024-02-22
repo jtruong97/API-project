@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchSpecificSpot } from '../../store/spots';
 import { getReviews } from '../../store/reviews';
+import CreateReviewModal from '../ReviewModal/ReviewModal';
+import OpenModalMenuItem from '../Navigation/OpenModalMenuItem';
 import './SpotDetails.css'
 
 const SpotDetails = () => {
@@ -18,7 +20,6 @@ const SpotDetails = () => {
     },[spotId,dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
     let reviewsArr = Object.values(reviews)
-    console.log('REV ARRAY!',reviewsArr, 'SPOT HERE', spot)
     if( //rerenders page if none of these exisit
         !reviewsArr.length ||
         !reviewsArr.every(rev=>rev.createdAt) ||
@@ -70,6 +71,7 @@ const SpotDetails = () => {
         })
     }
     let userId = users.user ? users.user.id : null
+    let hasReview = currRevArr.filter((rev) => rev.User.id == userId)
 
     return (
         <div>
@@ -114,15 +116,23 @@ const SpotDetails = () => {
                     <p>{rating} {rev}</p>
                 </div>
             </div>
+            {users.user && currSpot.ownerId !== userId && hasReview.length == 0 &&
+                (<button className='post-rev-button'>
+                <OpenModalMenuItem
+                    itemText='Post Your Review'
+                    modalComponent={<CreateReviewModal spotId={spotId}/>}
+                /></button>)
+            }
             <div className ='reviews-container'>
                 {currRevArr.map(review => (
-                    <>
-                        <p key={review.id}>{review.User.firstName}</p>
+                    <div key={review.id}>
+                        <p>{review.User.firstName}</p>
                         <p>{review.newDate}</p>
                         <p>{review.review}</p>
-                    </>
+                    </div>
                 ))}
-                {currRevArr.length == 0 && users.user &&currSpot.ownerId !== userId && (<p>Be the first to post a review!</p>)}
+                {currRevArr.length == 0 && users.user && currSpot.ownerId !== userId &&
+                (<p>Be the first to post a review!</p>)}
             </div>
         </div>
     )
