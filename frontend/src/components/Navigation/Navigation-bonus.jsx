@@ -7,20 +7,22 @@ function Navigation({ isLoaded }) {
   const sessionUser = useSelector(state => state.session.user);
 
   return (
-    <ul>
+    <ul className='header-container'>
       <li>
-        <NavLink to="/">Home</NavLink>
+        <NavLink to="/"><img className='home-logo'src='https://i.postimg.cc/yYpYM2Jh/Screenshot-2024-02-23-at-10-40-03-AM-removebg-preview.png' alt='sdv-logo'/></NavLink>
       </li>
-      {isLoaded && (
-        <li>
-          <ProfileButton user={sessionUser} />
-        </li>
-      )}
-      {sessionUser && (
-        <li>
-          <NavLink to='/spots/new'>Create a New Spot</NavLink>
-        </li>)
-      }
+      <div className='right-nav-bar'>
+        {sessionUser && (
+          <li>
+            <NavLink className='create-spot-button' to='/spots/new'>Create a New Spot</NavLink>
+          </li>)
+        }
+        {isLoaded && (
+          <li>
+            <ProfileButton user={sessionUser} />
+          </li>
+        )}
+      </div>
     </ul>
   );
 }
