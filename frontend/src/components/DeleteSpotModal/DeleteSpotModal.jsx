@@ -1,9 +1,9 @@
 import { useDispatch } from 'react-redux';
 import { deleteExistingSpot } from '../../store/spots';
 import { useModal } from '../../context/Modal';
-import './DeleteSpotModal.css'
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import './DeleteSpotModal.css'
 
 function DeleteModal({spot}) {
     const dispatch = useDispatch();

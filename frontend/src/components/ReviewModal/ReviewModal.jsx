@@ -30,7 +30,6 @@ const CreateReviewModal = ({spotId}) => {
    const onSubmit = async (e) => {
     e.preventDefault();
     let newRev = {review:review, stars:rating }
-    console.log('newReview!!!!!!!!', newRev)
 
     if(Object.values(validate).length > 0){
         console.error('Review is invalid')

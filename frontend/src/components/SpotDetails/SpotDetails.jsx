@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { fetchSpecificSpot } from '../../store/spots';
 import { getReviews } from '../../store/reviews';
 import CreateReviewModal from '../ReviewModal/ReviewModal';
+import DeleteReviewModal from '../DeleteReviewModal/DeleteReviewModal';
 import OpenModalMenuItem from '../Navigation/OpenModalMenuItem';
 import './SpotDetails.css'
 
@@ -20,7 +21,8 @@ const SpotDetails = () => {
     },[spotId,dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
     let reviewsArr = Object.values(reviews)
-    if( //rerenders page if none of these exisit
+    console.log('REVIEWS', reviews)
+    if( //rerenders page if none of these exist
         !reviewsArr.length ||
         !reviewsArr.every(rev=>rev.createdAt) ||
         !spot[spotId] ||
@@ -129,6 +131,11 @@ const SpotDetails = () => {
                         <p>{review.User.firstName}</p>
                         <p>{review.newDate}</p>
                         <p>{review.review}</p>
+                        {hasReview.length > 0 && (<button>
+                            <OpenModalMenuItem
+                                itemText='Delete'
+                                modalComponent={<DeleteReviewModal reviewId={review.id}/>}
+                            /></button>)}
                     </div>
                 ))}
                 {currRevArr.length == 0 && users.user && currSpot.ownerId !== userId &&

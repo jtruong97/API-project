@@ -401,7 +401,7 @@ router.delete('/:spotId', requireAuth, async (req, res) => {
 })
 
 //GET ALL REVIEWS BASED ON SPOT ID
-router.get('/:spotId/reviews', requireAuth, async (req,res) => {
+router.get('/:spotId/reviews', async (req,res) => {
     let { spotId } = req.params;
     let revArr = []
     spotId = parseInt(spotId)
