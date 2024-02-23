@@ -61,7 +61,7 @@ export const deleteReview = ( reviewId ) => async (dispatch) => {
     })
     if(response.ok){
         const data = await response.json();
-        dispatch(deleteReviewAction(data))
+        dispatch(deleteReviewAction(reviewId))
     }
 }
 

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchAllSpots } from "../../store/spots";
 import { NavLink } from "react-router-dom";
@@ -8,19 +8,20 @@ import OpenModalMenuItem from "../Navigation/OpenModalMenuItem";
 import './ManageSpot.css'
 
 const ManageSpot = () => {
+    const user = useSelector(state => {return state.session.user})
+    const spots = useSelector(state => {return state.spotsState})
     const dispatch = useDispatch();
+    const userId = user.id;
 
-    const user = useSelector(state => {
-        return state.session.user
-    })
-    const spots = useSelector(state => {
-     return state.spotsState
-    })
-   const userId = user.id;
+    const [postSpot, setPostSpot] = useState(false)
+
+    const renderSpot = () => {
+        setPostSpot(curr => !curr)
+    }
 
    useEffect(()=> {
     dispatch(fetchAllSpots())
-   },[dispatch])
+   },[dispatch, postSpot])
 
    let spotArr = Object.values(spots)
    spotArr = spotArr.filter(spot => spot.ownerId == userId) //new Arr with only current owners spots
@@ -53,7 +54,7 @@ const ManageSpot = () => {
                         <button className='delete-button'>
                             <OpenModalMenuItem
                                 itemText="Delete"
-                                modalComponent={<DeleteModal spot={spot}/>}
+                                modalComponent={<DeleteModal spot={spot} renderSpot={renderSpot}/>}
                             />
                         </button>
                     </div>

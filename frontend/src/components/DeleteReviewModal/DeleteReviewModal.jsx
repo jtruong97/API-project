@@ -1,20 +1,22 @@
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import { deleteReview } from '../../store/reviews';
+import { useNavigate } from 'react-router-dom';
 import './DeleteReviewModal.css'
 
-const DeleteReviewModal = ({reviewId}) => {
+const DeleteReviewModal = ({reviewId, spotId, renderDelete}) => {
     console.log(reviewId,'REVIEW ID')
     const dispatch = useDispatch();
     const { closeModal } = useModal();
+    const nav = useNavigate();
 
     const deleteReviews = async (e) => {
         e.preventDefault();
         await dispatch(deleteReview(reviewId))
-        .then(closeModal)
+        renderDelete() //triggers rerender
+        closeModal()
+        nav(`/spots/${spotId}`)
     }
-
-
 
     return(
         <>

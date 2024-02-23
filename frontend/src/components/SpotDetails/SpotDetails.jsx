@@ -1,5 +1,5 @@
 import { useDispatch, useSelector} from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchSpecificSpot } from '../../store/spots';
 import { getReviews } from '../../store/reviews';
@@ -15,13 +15,22 @@ const SpotDetails = () => {
     const reviews = useSelector(state => {return state.reviewState})
     const users = useSelector(state => {return state.session})
 
+    const [postReview, setPostReview] = useState(false)
+    const [deleteReview, setDeleteReview] = useState(false)
+
+    const renderReview = () => {
+        setPostReview(curr => !curr)
+    }
+    const renderDelete = () => {
+        setDeleteReview(curr => !curr)
+    }
+
     useEffect(() => {
         dispatch(fetchSpecificSpot(spotId))
         dispatch(getReviews(spotId))
-    },[spotId,dispatch]) //if spotId changes, triggers dispatch to fetch specific spot Id
+    },[spotId,dispatch, deleteReview, postReview]) //if spotId changes, triggers dispatch to fetch specific spot Id
 
     let reviewsArr = Object.values(reviews)
-    console.log('REVIEWS', reviews)
     if( //rerenders page if none of these exist
         !reviewsArr.length ||
         !reviewsArr.every(rev=>rev.createdAt) ||
@@ -122,7 +131,7 @@ const SpotDetails = () => {
                 (<button className='post-rev-button'>
                 <OpenModalMenuItem
                     itemText='Post Your Review'
-                    modalComponent={<CreateReviewModal spotId={spotId}/>}
+                    modalComponent={<CreateReviewModal spotId={spotId} renderReview={renderReview}/>}
                 /></button>)
             }
             <div className ='reviews-container'>
@@ -134,7 +143,7 @@ const SpotDetails = () => {
                         {hasReview.length > 0 && (<button>
                             <OpenModalMenuItem
                                 itemText='Delete'
-                                modalComponent={<DeleteReviewModal reviewId={review.id}/>}
+                                modalComponent={<DeleteReviewModal reviewId={review.id} renderDelete={renderDelete} spotId={spotId}/>}
                             /></button>)}
                     </div>
                 ))}

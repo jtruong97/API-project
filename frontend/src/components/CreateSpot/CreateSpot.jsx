@@ -7,6 +7,7 @@ import './CreateSpot.css'
 
 const CreateSpot = ({spot}) => {
     //console.log('SPOT', spot)
+    let currUser = useSelector(state => state.session.user)
 
     const [country, setCountry] = useState(''|| spot.country);
     const [address, setAddress] = useState('' || spot.address);
@@ -33,7 +34,6 @@ const CreateSpot = ({spot}) => {
     const dispatch = useDispatch();
     const nav = useNavigate();
     const {spotId} = useParams();
-    let currUser = useSelector(state => state.session.user)
     //console.log('USER',currUser.id)
 
     useEffect(()=>{

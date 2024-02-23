@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import './ReviewModal.css'
 import { useNavigate } from 'react-router-dom';
 
-const CreateReviewModal = ({spotId}) => {
+const CreateReviewModal = ({spotId, renderReview}) => {
     const dispatch = useDispatch();
     const { closeModal } = useModal();
     const nav = useNavigate();
@@ -37,6 +37,7 @@ const CreateReviewModal = ({spotId}) => {
     let newReview = await dispatch(createReview(newRev, spotId))
     if(!newReview) return;
     closeModal()
+    renderReview();
     nav(`/spots/${spotId}`)
    }
 
