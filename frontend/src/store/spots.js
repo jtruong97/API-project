@@ -64,7 +64,7 @@ export const createNewSpot = (spot) => async(dispatch) => {
     })
     if(response.ok){
         const data = await response.json();
-        dispatch(viewSpot(data))
+        dispatch(viewSpot(data.id))
 
         spot.SpotImages.map(img => {
             csrfFetch(`/api/spots/${data.id}/images`, {

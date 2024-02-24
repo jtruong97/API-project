@@ -15,6 +15,7 @@
     box-shadow: 2px 2px 5px grey;
     margin-top: 10px;
     align-content: center;
+    background-color: rgb(168, 209, 214);
 }
 
 .login-label{
@@ -32,4 +33,12 @@
     margin-top: 10px;
     display: flex;
     justify-content: center;
+    color:rgb(33, 116, 155);
+}
+
+.validation-checks{
+    color: rgb(194, 37, 37);
+    display: flex;
+    justify-content: center;
+    margin: 0px;
 }

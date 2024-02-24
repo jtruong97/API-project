@@ -17,6 +17,7 @@ const SpotDetails = () => {
 
     const [postReview, setPostReview] = useState(false)
     const [deleteReview, setDeleteReview] = useState(false)
+    // const [renderSpotId, setRenderSpotId] = useState(false)
 
     const renderReview = () => {
         setPostReview(curr => !curr)
@@ -47,7 +48,7 @@ const SpotDetails = () => {
     newImgArr.shift()
 
     //rating format
-    let rating = parseInt(currSpot.avgStarRating).toFixed(1)
+    let rating = parseFloat(currSpot.avgStarRating).toFixed(1)
     if(isNaN(rating)){
         rating = 'New'
     }
@@ -76,7 +77,7 @@ const SpotDetails = () => {
             rev.newDate = `${month} ${year}`
         })
         revArr.map(rev => {
-            if(rev.spotId ===  currSpot.id){
+            if(rev.spotId ==  currSpot.id){
                 currRevArr.push(rev)
             }
         })
@@ -85,10 +86,10 @@ const SpotDetails = () => {
     let hasReview = currRevArr.filter((rev) => rev.User.id == userId)
 
     return (
-        <div>
-            <h1>{currSpot.name}</h1>
+        <div className='spot-details-container'>
+            <h1 className='spot-name'>{currSpot.name}</h1>
             <div className='spot-location'>
-                Location: {currSpot.city}, {currSpot.state}, {currSpot.country}
+                {currSpot.city}, {currSpot.state}, {currSpot.country}
             </div>
             <div className='img-container'>
                 <img className='spotId-large-img'src={`${imgarr[0][0].url}`}/>
@@ -101,7 +102,7 @@ const SpotDetails = () => {
             <div className='below-img-container'>
                 <div className ='host-description-container'>
                     <div className='spotId-host'>
-                        Hosted by {currSpot.Owner.firstName}, {currSpot.Owner.lastName}
+                        Hosted by {currSpot.Owner.firstName} {currSpot.Owner.lastName}
                     </div>
                     <div className='spot-description'>
                         {currSpot.description}
@@ -121,9 +122,9 @@ const SpotDetails = () => {
                 </div>
             </div>
             <hr></hr>
-            <div>
+            <div className='spot-details-review-header'>
                 <div className='star-rating-review'>
-                    <img className='stardrop-img' src='https://i.postimg.cc/D0SVzkzk/image-removebg-preview.png' alt='stardrop'/>
+                    <img className='stardrop-img-review' src='https://i.postimg.cc/D0SVzkzk/image-removebg-preview.png' alt='stardrop'/>
                     <p>{rating} {rev}</p>
                 </div>
             </div>
@@ -137,10 +138,10 @@ const SpotDetails = () => {
             <div className ='reviews-container'>
                 {currRevArr.map(review => (
                     <div key={review.id}>
-                        <p>{review.User.firstName}</p>
-                        <p>{review.newDate}</p>
-                        <p>{review.review}</p>
-                        {hasReview.length > 0 && (<button>
+                        <p className='spot-details-firstName'>{review.User.firstName}</p>
+                        <p className='spot-details-date'>{review.newDate}</p>
+                        <p className='spot-details-review'>{review.review}</p>
+                        {hasReview.length > 0 && review.User.id == userId && (<button className='delete-rev-button'>
                             <OpenModalMenuItem
                                 itemText='Delete'
                                 modalComponent={<DeleteReviewModal reviewId={review.id} renderDelete={renderDelete} spotId={spotId}/>}

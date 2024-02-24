@@ -24,6 +24,7 @@ function LoginFormModal() {
         }
       });
   };
+  //console.log(errors,'ERRORS STATE')
 
   const loginDemo = (e) => {
     e.preventDefault();
@@ -57,7 +58,7 @@ function LoginFormModal() {
             required
           />
         </label>
-        {errors.credential && <p>{errors.credential}</p>}
+        {errors.credential && <p className='validation-checks'>{errors.credential}</p>}
         <button
           type="submit"
           disabled={credential.length <4 || password.length < 6}

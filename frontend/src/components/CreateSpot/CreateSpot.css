@@ -1,4 +1,7 @@
-
+.form-header{
+    display: flex;
+    padding: 0 15% 0% 15%;
+}
 .spot-form{
     padding: 0 15% 2% 15%;
 }
@@ -24,10 +27,11 @@
 }
 .url-box{
     width: 100%;
-    margin-bottom: 12px;
+    margin-top: 12px;
 }
 .name-container{
     display: flex;
+    gap: 8px;
 }
 
 .city-state-container{
