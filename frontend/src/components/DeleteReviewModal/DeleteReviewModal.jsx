@@ -21,12 +21,12 @@ const DeleteReviewModal = ({reviewId, spotId, renderDelete}) => {
     }
 
     return(
-        <>
-            <h1>Confirm Delete</h1>
-            <p>Are you sure you want to remove this spot from the listings?</p>
-            <button onClick={deleteReviews}>Yes (Delete Review)</button>
-            <button onClick={closeModal}>No (Keep Review)</button>
-        </>
+        <div className='delete-review-form'>
+            <h1 className='confirm-delete-header'>Confirm Delete</h1>
+            <p>Are you sure you want to delete this review?</p>
+            <button className='delete-rev-btn' onClick={deleteReviews}>Yes (Delete Review)</button>
+            <button className='dont-delete-rev-btn' onClick={closeModal}>No (Keep Review)</button>
+        </div>
     )
 }
 

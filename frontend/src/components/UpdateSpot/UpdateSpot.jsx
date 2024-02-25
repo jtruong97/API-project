@@ -17,11 +17,12 @@ const UpdateSpot = () => {
     },[spotId, dispatch])
 
     //console.log('CURRENT SPOT',currSpot)
+    let buttonName = 'Update Spot'
 
     return(
         <>
             <h1 className='form-header'>Update your Spot</h1>
-            <CreateSpot spot={currSpot}/>
+            <CreateSpot spot={currSpot} buttonName={buttonName}/>
         </>
     )
 }
