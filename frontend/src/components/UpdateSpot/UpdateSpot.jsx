@@ -20,7 +20,7 @@ const UpdateSpot = () => {
 
     return(
         <>
-            <h1>Update your Spot</h1>
+            <h1 className='form-header'>Update your Spot</h1>
             <CreateSpot spot={currSpot}/>
         </>
     )

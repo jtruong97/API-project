@@ -43,7 +43,7 @@ function SignupFormPage() {
 
   return (
     <>
-      <h1>Sign Up</h1>
+      <h1 className='signup-header'>Sign Up</h1>
       <form onSubmit={handleSubmit}>
         <label>
           Email

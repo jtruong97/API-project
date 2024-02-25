@@ -274,9 +274,11 @@ check('country')
     .exists({ checkFalsy: true })
     .withMessage('Country is required.'),
 check('lat')
+    .optional({nullable: true, checkFalsy: true})
     .isFloat({ min: -90, max: 90 })
     .withMessage('Latitude must be within -90 and 90'),
 check('lng')
+    .optional({nullable: true, checkFalsy: true})
     .isFloat({ min: -180, max: 180})
     .withMessage('Longitude must be within -180 and 180'),
 check('name')
@@ -401,7 +403,7 @@ router.delete('/:spotId', requireAuth, async (req, res) => {
 })
 
 //GET ALL REVIEWS BASED ON SPOT ID
-router.get('/:spotId/reviews', requireAuth, async (req,res) => {
+router.get('/:spotId/reviews', async (req,res) => {
     let { spotId } = req.params;
     let revArr = []
     spotId = parseInt(spotId)
@@ -433,7 +435,7 @@ router.get('/:spotId/reviews', requireAuth, async (req,res) => {
             review: review.review,
             stars: review.stars,
             createdAt: review.createdAt,
-            uodatedAt: review.updatedAt,
+            updatedAt: review.updatedAt,
             User: user,
             ReviewImages: reviewimg
         }

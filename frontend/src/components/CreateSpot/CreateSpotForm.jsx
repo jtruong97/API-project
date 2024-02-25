@@ -15,7 +15,7 @@ const CreateSpotForm = () => {
     }
     return(
         <>
-            <h1>Create a new Spot</h1>
+            <h1 className='form-header'>Create a new Spot</h1>
             <CreateSpot spot={spot}/>
         </>
     )
