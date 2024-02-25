@@ -7,7 +7,6 @@
     padding-left: 10px;
 }
 .spot-location{
-    padding-left: 10px;
     padding-bottom: 10px;
     text-decoration: none;
     font-weight: 300;
@@ -80,6 +79,10 @@
     color: rgb(66, 65, 65);
     padding: 7px;
 }
+.reserve-button:hover{
+    background-color: rgb(153, 190, 153);
+    color: white;
+}
 
 .star-rating-review {
     display: flex;
@@ -123,4 +126,8 @@
     color: rgb(66, 65, 65);
     width: 120px;
     padding: 5px;
+}
+.delete-rev-button:hover{
+    background-color: rgb(215, 104, 104);
+    color: white;
 }

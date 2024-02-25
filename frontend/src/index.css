@@ -1,1 +1,9 @@
 /* TODO: Add sitewide styles */
+button{
+    cursor: pointer;
+}
+body{
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}

@@ -13,10 +13,11 @@ const CreateSpotForm = () => {
         price:'',
         SpotImages:[]
     }
+    let buttonName = 'Create Spot'
     return(
         <>
             <h1 className='form-header'>Create a new Spot</h1>
-            <CreateSpot spot={spot}/>
+            <CreateSpot spot={spot} buttonName={buttonName}/>
         </>
     )
 }

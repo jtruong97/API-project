@@ -1,0 +1,33 @@
+.delete-spot-form{
+    display: flex;
+    flex-direction: column;
+    padding: 0px 60px 20px 60px;
+}
+.delete-spot-header{
+    display: flex;
+    justify-content: center;
+}
+.delete-spot-btn{
+    padding: 8px;
+    box-shadow: 2px 2px 5px grey;
+    margin-top: 10px;
+    align-content: center;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+}
+.delete-spot-btn:hover{
+    background-color: rgb(215, 104, 104);
+    color: white;
+}
+.dont-delete-spot-btn{
+    padding: 8px;
+    box-shadow: 2px 2px 5px grey;
+    margin-top: 10px;
+    align-content: center;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+}
+.dont-delete-spot-btn:hover{
+    background-color: grey;
+    color: white;
+}

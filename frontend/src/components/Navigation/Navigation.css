@@ -39,3 +39,13 @@
   color: rgb(75, 74, 74);
   padding: 7px;
 }
+
+.prof-btn-li{
+  padding: 5px;
+}
+
+.logged-prof-btn{
+  background-color: rgb(168, 209, 214);
+  width: 100%;
+  padding: 3px;
+}

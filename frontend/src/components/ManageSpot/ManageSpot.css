@@ -1,3 +1,74 @@
 .delete-button{
     list-style-type:none;
 }
+.cur-spot-container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.each-curr-spot-container{
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    width: 500px;
+}
+.manage-spots-header{
+    padding-left: 30px;
+    color: rgb(66, 65, 65);
+}
+.curr-create-spot-btn{
+    margin-left: 30px;
+    padding: 3px;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+}
+.manage-spot-img{
+    width: 100%;
+    border-radius: 10px;
+}
+.curr-img-container{
+    display: flex;
+    height: 380px;
+}
+.text-blow-img-container{
+    padding: 0 10px;
+}
+.curr-location-rating-container{
+    display: flex;
+    justify-content: space-between;
+}
+.curr-rating-container{
+    display: flex;
+    height: 50px;
+}
+.curr-stardrop-img{
+    align-self: center;
+    height: 50%;
+    padding-right: 5px;
+}
+
+.curr-navLinks{
+    text-decoration: none;
+    color: rgb(66, 65, 65);
+}
+.delete-button {
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+    padding: 10px 25px;
+}
+
+.update-button{
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+    padding: 10px 25px;
+}
+.update-button-link{
+    text-decoration: none;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+}
+.update-delete-container{
+    display: flex;
+    width: 45%;
+    justify-content: space-between;
+}
