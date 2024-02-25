@@ -1,12 +1,12 @@
 .filled {
-    color: rgb(238, 222, 45);
+    color: rgb(246, 213, 53);
 }
 
 .filled:hover{
-    color: rgb(238, 222, 45);
+    color: rgb(246, 213, 53);
 }
 .empty {
-    color: rgb(155, 155, 155);
+    color: rgb(83, 94, 107);
 }
 .star-container{
     display: flex;
