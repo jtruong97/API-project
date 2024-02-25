@@ -1,25 +1,20 @@
 import { useDispatch } from 'react-redux';
 import { deleteExistingSpot } from '../../store/spots';
 import { useModal } from '../../context/Modal';
-import './DeleteSpotModal.css'
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import './DeleteSpotModal.css'
 
-function DeleteModal({spot}) {
+function DeleteModal({spot, renderSpot}) {
     const dispatch = useDispatch();
     const nav = useNavigate();
     const { closeModal } = useModal();
-    const [spotDeleted, setSpotDeleted] = useState(false);
 
     const deleteSpot = async (e) => {
         e.preventDefault();
         await dispatch(deleteExistingSpot(spot.id))
-        .then(closeModal)
-        .then(setSpotDeleted(true))
+        closeModal()
+        renderSpot()
         nav('/spots/current')
-    }
-    if(spotDeleted){
-        return;
     }
 
     return(

@@ -1,0 +1,18 @@
+.filled {
+    color: rgb(238, 222, 45);
+}
+
+.filled:hover{
+    color: rgb(238, 222, 45);
+}
+.empty {
+    color: rgb(155, 155, 155);
+}
+.star-container{
+    display: flex;
+    justify-content: center;
+    padding: 3px;
+}
+.star-text{
+    padding-left: 5px;
+}

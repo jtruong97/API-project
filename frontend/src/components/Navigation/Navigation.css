@@ -1,7 +1,41 @@
 .profile-dropdown {
   position: absolute;
+  border: rgb(133, 133, 133) 1px solid;
+  border-radius: 4px;
+  background-color: rgb(246, 254, 255);
+  list-style-type: none;
+  justify-content: center;
+  padding: 15px;
+  right: 35px;
 }
 
 .hidden {
   display: none;
+}
+.header-container{
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(152, 151, 151);
+}
+.right-nav-bar{
+  display: flex;
+  align-items: center;
+  padding: 25px;
+}
+
+.home-logo{
+  width: 120px;
+  padding: 0;
+}
+
+.create-spot-button{
+  text-decoration: none;
+  color: rgb(3, 117, 193);
+  padding: 25px;
+}
+
+.fa-user-circle{
+  color: rgb(75, 74, 74);
+  padding: 7px;
 }

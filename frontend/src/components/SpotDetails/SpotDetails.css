@@ -1,3 +1,22 @@
+.spot-details-container{
+    display: flex;
+    flex-direction: column;
+    padding: 0px 40px 0px 40px;
+}
+.spot-name{
+    padding-left: 10px;
+}
+.spot-location{
+    padding-left: 10px;
+    padding-bottom: 10px;
+    text-decoration: none;
+    font-weight: 300;
+}
+.spotId-host{
+    font-size: 25px;
+    padding-bottom: 15px;
+}
+
 .img-container {
     padding: 5px;
     display: flex;
@@ -55,8 +74,53 @@
     padding-right: 5px;
     padding-top: 10px;
 }
+.reserve-button{
+    width: 85%;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+    padding: 7px;
+}
 
 .star-rating-review {
     display: flex;
+    align-items: center;
     height: 30px;
+}
+.spot-details-review-header{
+    font-size: 20px;
+    border-top: 1px solid grey;
+    padding: 25px 0 10px 10px
+}
+.stardrop-img-review{
+    align-self: center;
+    height: 100%;
+    padding-right: 5px;
+}
+.reviews-container{
+    padding-left:10px;
+}
+
+.post-rev-button{
+    list-style-type:none;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+    width: 200px;
+    padding: 5px;
+}
+.spot-details-firstName{
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+.spot-details-date{
+    color: rgb(116, 116, 116);
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+.delete-rev-button{
+    list-style-type: none;
+    background-color: rgb(168, 209, 214);
+    color: rgb(66, 65, 65);
+    width: 120px;
+    padding: 5px;
 }

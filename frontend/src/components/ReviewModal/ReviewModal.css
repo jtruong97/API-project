@@ -1,34 +1,29 @@
-/* .signup-modal-container{
-    display: flex;
-    flex-direction: column;
-} */
-.signup-form{
+.review-form{
     display: flex;
     flex-direction: column;
     padding: 0px 60px 20px 60px;
-}
+} */
 
-.signup-header{
+.create-review-header{
     display: flex;
     justify-content: center;
 }
 
-.signup-input{
-    padding-right: 250px;
+.review-input{
+    width: 100%;
+    padding-bottom: 100px;
+    resize: vertical;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
-
-.signup-button{
+.rev-button-container{
+    display: flex;
+    justify-content: center;
+}
+.review-button{
     padding: 8px;
     box-shadow: 2px 2px 5px grey;
     margin-top: 10px;
     align-content: center;
     background-color: rgb(168, 209, 214);
 }
-
-.signup-label{
-    padding: 5px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
