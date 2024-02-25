@@ -33,24 +33,29 @@ const ManageSpot = () => {
 
     return(
         <>
-            <h1>Manage Spots</h1>
-            <button onClick={navToCreate}>Create a New Spot</button>
+            <h1 className='manage-spots-header'>Manage Spots</h1>
+            {/* <button className='curr-create-spot-btn'onClick={navToCreate}>Create a New Spot</button> */}
+            {spotArr.length == 0 && (<button className='curr-create-spot-btn' onClick={navToCreate}>Create a New Spot</button>)}
             <div className='cur-spot-container'>
                 {spotArr.map(spot => (
-                    <>
-                    <NavLink to={`/spots/${spot.id}`}>
-                    <img key={spot.id} src={`${spot.previewImage}`} alt={spot.name}/>
+                    <div className='each-curr-spot-container'>
+                    <NavLink className='curr-navLinks' to={`/spots/${spot.id}`}>
+                    <div className='curr-img-container'>
+                        <img key={spot.id} src={`${spot.previewImage}`} alt={spot.name} className='manage-spot-img'/>
+                    </div>
                         <div className='text-blow-img-container'>
-                            <p>{spot.city}, {spot.state}</p>
-                            <div className='curr-rating-container'>
-                                <img src='https://i.postimg.cc/D0SVzkzk/image-removebg-preview.png' alt='stardrop'/>
-                                <p>{isNaN(spot.avgRating) ? 'New' : (parseInt(spot.avgRating).toFixed(1))}</p>
+                            <div className="curr-location-rating-container">
+                                <p className='curr-city-state'>{spot.city}, {spot.state}</p>
+                                <div className='curr-rating-container'>
+                                    <img className ='curr-stardrop-img'src='https://i.postimg.cc/D0SVzkzk/image-removebg-preview.png' alt='stardrop'/>
+                                    <p>{isNaN(spot.avgRating) ? 'New' : (parseInt(spot.avgRating).toFixed(1))}</p>
+                                </div>
                             </div>
-                            <p>${spot.price} night</p>
+                            <p className='curr-price-container'>${spot.price} night</p>
                         </div>
                     </NavLink>
                     <div className='update-delete-container'>
-                        <button><NavLink to={`/spots/${spot.id}/edit`}>Update</NavLink></button>
+                        <button className='update-button'><NavLink className='update-button-link' to={`/spots/${spot.id}/edit`}>Update</NavLink></button>
                         <button className='delete-button'>
                             <OpenModalMenuItem
                                 itemText="Delete"
@@ -58,7 +63,7 @@ const ManageSpot = () => {
                             />
                         </button>
                     </div>
-                    </>
+                    </div>
                 ))}
             </div>
         </>

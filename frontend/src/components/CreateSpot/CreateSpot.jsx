@@ -6,7 +6,7 @@ import { createNewSpot, updateExistingSpot } from "../../store/spots"
 import './CreateSpot.css'
 
 
-const CreateSpot = ({spot}) => {
+const CreateSpot = ({spot, buttonName}) => {
     let currUser = useSelector(state => state.session.user)
     // const reviews = useSelector(state => {return state.reviewState})
 
@@ -367,7 +367,7 @@ const CreateSpot = ({spot}) => {
                 className='create-button'
                 type='submit'
                 disabled={Object.keys(errors).length > 0}
-            >Create Spot</button>
+            >{buttonName}</button>
            </div>
         </form>
     )
