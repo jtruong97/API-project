@@ -38,7 +38,7 @@ const ManageSpot = () => {
             {spotArr.length == 0 && (<button className='curr-create-spot-btn' onClick={navToCreate}>Create a New Spot</button>)}
             <div className='cur-spot-container'>
                 {spotArr.map(spot => (
-                    <div className='each-curr-spot-container'>
+                    <div key={spot.id}className='each-curr-spot-container'>
                     <NavLink className='curr-navLinks' to={`/spots/${spot.id}`}>
                     <div className='curr-img-container'>
                         <img key={spot.id} src={`${spot.previewImage}`} alt={spot.name} className='manage-spot-img'/>
