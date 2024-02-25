@@ -1,10 +1,18 @@
 .filled {
-    color: red;
+    color: rgb(238, 222, 45);
 }
 
 .filled:hover{
-    color: red;
+    color: rgb(238, 222, 45);
 }
 .empty {
-    color: grey;
+    color: rgb(155, 155, 155);
+}
+.star-container{
+    display: flex;
+    justify-content: center;
+    padding: 3px;
+}
+.star-text{
+    padding-left: 5px;
 }

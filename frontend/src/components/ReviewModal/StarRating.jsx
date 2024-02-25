@@ -11,7 +11,7 @@ const StarRating = ({rating, starClick}) => {
 
     let stars = [1,2,3,4,5]
     return(
-        <div>
+        <div className='star-container'>
         {stars.map(star => (
             <span
                 key={star}
@@ -23,6 +23,7 @@ const StarRating = ({rating, starClick}) => {
                     <FaStar/>
             </span>
         ))}
+        <span className='star-text'>Stars</span>
         </div>
     )
 }

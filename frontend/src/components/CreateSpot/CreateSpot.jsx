@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { createNewSpot, updateExistingSpot } from "../../store/spots"
 
@@ -36,31 +36,97 @@ const CreateSpot = ({spot}) => {
     const nav = useNavigate();
     const {spotId} = useParams();
 
-    useEffect(()=>{
-        // if(previewImage.length == 0){
-        //     errors.previewImage ='Preview image is required'
-        // }
-        if(img1 && (img1.slice(-3) !== 'png' || img1.slice(-3) !== 'jpg' || img1.slice(-4)!== 'jpeg')){
-            errors.img1 = 'Image URL must end in .png, .jpg or .jpeg'
-        }
-        if(img2 && (img2.slice(-3) !== 'png' || img2.slice(-3) !== 'jpg' || img2.slice(-4)!== 'jpeg')){
-            errors.img2 = 'Image URL must end in .png, .jpg or .jpeg'
-        }
-        if(img3 && (img3.slice(-3) !== 'png' || img3.slice(-3) !== 'jpg' || img3.slice(-4)!== 'jpeg')){
-            errors.img3 = 'Image URL must end in .png, .jpg or .jpeg'
-        }
-        if(img4 && (img4.slice(-3) !== 'png' || img4.slice(-3) !== 'jpg' || img4.slice(-4)!== 'jpeg')){
-            errors.img4 = 'Image URL must end in .png, .jpg or .jpeg'
-        }
-    },[previewImage,img1, img2, img3, img4, errors])
-
     if(!spot)return
     let checkSpot= Object.values(spot)
-
 
     const onSubmit = async (e) =>{
         e.preventDefault();
         setErrors({});
+
+        //errors
+        if(!country){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                country:'Country is required'
+            }))
+        }
+        if(!address){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                address:'Address is required'
+            }))
+        }
+        if(!city){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                city:'City is required'
+            }))
+        }
+        if(!state){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                state:'State is required'
+            }))
+        }
+        if(lat < -90 || lat > 90){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                lat:'Latitude must be within -90 and 90'
+            }))
+        }
+        if(lng < -180 || lng > 180){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                lng:'Longitude must be within -180 and 180'
+            }))
+        }
+        if(description.length < 30){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                description:'Description needs a minimum of 30 characters'
+            }))
+        }
+        if(!name){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                name:'Name is required'
+            }))
+        }
+        if(!price){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                price:'Price is required'
+            }))
+        }if(price < 0){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                price:'Price must be positive'
+            }))
+        }
+        if(!previewImage){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                previewImage: 'Preview image is required'
+            }))
+        }
+
+        const imgVal = [img1, img2, img3, img4];
+        imgVal.forEach((imgVal, index) => {
+            if (imgVal && !imgVal.endsWith('.png') && !imgVal.endsWith('.jpg') && !imgVal.endsWith('.jpeg')) {
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    [`img${index + 1}`]: 'Image URL must end in .png, .jpg, or .jpeg'
+                }));
+            }
+        });
+        if(!previewImage.endsWith('.png') && !previewImage.endsWith('.jpg') && !previewImage.endsWith('.jpeg')){
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                previewImage: 'Preview image must end in .png, .jpg, or ,jpeg'
+            }))
+            throw new Error("Error: Could not create a new spot")
+        }
+
 
         let images = [{
             url: previewImage,
@@ -96,7 +162,7 @@ const CreateSpot = ({spot}) => {
             if(!updateSpot) return
         }
     }
-    console.log(errors, 'ERRORS OBJECTT HERE')
+
     return(
         <form
             className='spot-form'

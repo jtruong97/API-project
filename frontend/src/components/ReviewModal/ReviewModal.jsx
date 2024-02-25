@@ -3,8 +3,9 @@ import { useModal } from '../../context/Modal';
 import { createReview } from '../../store/reviews';
 import StarRating from './StarRating';
 import { useState, useEffect } from 'react';
-import './ReviewModal.css'
 import { useNavigate } from 'react-router-dom';
+import { fetchSpecificSpot } from '../../store/spots';
+import './ReviewModal.css'
 
 const CreateReviewModal = ({spotId, renderReview}) => {
     const dispatch = useDispatch();
@@ -31,11 +32,9 @@ const CreateReviewModal = ({spotId, renderReview}) => {
     e.preventDefault();
     let newRev = {review:review, stars:rating }
 
-    if(Object.values(validate).length > 0){
-        console.error('Review is invalid')
-    }
     let newReview = await dispatch(createReview(newRev, spotId))
     if(!newReview) return;
+    dispatch(fetchSpecificSpot(spotId))
     closeModal()
     renderReview();
     nav(`/spots/${spotId}`)
@@ -46,9 +45,10 @@ const CreateReviewModal = ({spotId, renderReview}) => {
             className='review-form'
             onSubmit={onSubmit}
         >
-            <h1>How was your stay?</h1>
+            <h1 className='create-review-header'>How was your stay?</h1>
             <label>
-                <input
+                <textarea
+                    className='review-input'
                     type='text'
                     name='description'
                     value={review}
@@ -56,14 +56,15 @@ const CreateReviewModal = ({spotId, renderReview}) => {
                     onChange={(e)=> setReview(e.target.value)}
                 />
             </label>
-            {'review' in validate && (<p>{validate.review}</p>)}
+            {/* {review.error && (<p>{validate.review}</p>)} */}
             <div className='star-container'>
                 <StarRating rating={rating} starClick={starClick}/>
             </div>
             <div className='rev-button-container'>
                 <button
+                    className='review-button'
                     type='submit'
-                    disabled={Object.keys(validate).length > 0}
+                    disabled={Object.keys(validate).length > 0 || !rating}
                 >Submit Your Review</button>
             </div>
         </form>

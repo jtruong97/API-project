@@ -31,7 +31,7 @@ export const getReviews = (spotId) => async(dispatch) =>{
     const response = await fetch(`/api/spots/${spotId}/reviews`)
     if(response.ok){
         const data = await response.json();
-        console.log('get REIVEWS HERE ', data);
+        //console.log('get REIVEWS HERE ', data);
         dispatch(viewReview(data))
     }
     if(!response.ok){
@@ -47,6 +47,7 @@ export const createReview = (review,spotId) => async(dispatch) => {
     if(response.ok){
         const data = await response.json();
         dispatch(createReviewAction(data))
+        //console.log(data, 'CREATE REVIEW DATA IN THINK')
         return data;
     }
     if(!response.ok){
