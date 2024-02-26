@@ -137,10 +137,10 @@ const CreateSpot = ({spot, buttonName}) => {
                 }));
             }
         });
-        if(!previewImage.endsWith('.png') || !previewImage.endsWith('.jpg') || !previewImage.endsWith('.jpeg')){
+        if(!(previewImage.endsWith('.png') || previewImage.endsWith('.jpg') || previewImage.endsWith('.jpeg'))){
             setErrors(prevErrors => ({
                 ...prevErrors,
-                previewImage: 'Preview image must end in .png, .jpg, or ,jpeg'
+                previewImage: 'Preview image must end in .png, .jpg, or .jpeg'
             }))
             throw new Error("Error: Could not create a new spot")
         }
