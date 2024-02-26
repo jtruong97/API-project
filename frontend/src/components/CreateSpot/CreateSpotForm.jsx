@@ -11,7 +11,12 @@ const CreateSpotForm = () => {
         description:'',
         name:'',
         price:'',
-        SpotImages:[]
+       SpotImages:[]
+    //    previewImage:'',
+    //    img1: '',
+    //    img2: '',
+    //    img3: '',
+    //    img4: '',
     }
     let buttonName = 'Create Spot'
     return(
