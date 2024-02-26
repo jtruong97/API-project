@@ -44,7 +44,7 @@ const SpotDetails = () => {
     return (
         <div className='spot-details-container'>
             <h1 className='spot-name'>{currSpot.name}</h1>
-            <div className='spot-location'>
+            <div className='curr-spot-location'>
                 {currSpot.city}, {currSpot.state}, {currSpot.country}
             </div>
             <div className='img-container'>
