@@ -169,7 +169,7 @@ const CreateSpot = ({spot, buttonName}) => {
             onSubmit={onSubmit}
         >
             <h2>Where&apos;s your place located?</h2>
-            <p>Guests will only get your exact address once they booked a reservation</p>
+            <p>Guests will only get your exact address once they booked a reservation.</p>
             <label className='label-container'>
                 <div className='name-container'>
                     Country
@@ -211,7 +211,9 @@ const CreateSpot = ({spot, buttonName}) => {
                         value={city}
                         placeholder="City"
                         onChange={(e) => setCity(e.target.value)}
-                    />,
+
+                    />
+                    <span className='comma-element'>,</span>
                 </label>
                 <label className='label-container state-container'>
                     <div className="name-container">
@@ -228,28 +230,29 @@ const CreateSpot = ({spot, buttonName}) => {
                     />
                 </label>
             </div>
-            <div className='lat-lng-container lat-lng-box'>
-                <label className='label-container'>
+            <div className='lat-lng-container'>
+                <label className='label-container lat-lng-box'>
                     <div className='name-container'>
                         Latitude
                         {errors.lat && (<span className='val'>{errors.lat}</span>)}
                     </div>
                     <input
-                        className="input-box"
+                        className="input-box lat-lng-input"
                         type='text'
                         name='latitude'
                         value={lat}
                         placeholder="Latitude"
                         onChange={(e) => setLat(e.target.value)}
                     />
+                    <span className='comma-element'>,</span>
                 </label>
-                <label className='label-container'>
+                <label className='label-container lat-lng-box'>
                     <div className="name-container">
                         Longitude
                         {errors.lng && (<span className='val'>{errors.lng}</span>)}
                     </div>
                     <input
-                        className="input-box"
+                        className="input-box lat-lng-input"
                         type='text'
                         name='longitude'
                         value={lng}
@@ -261,7 +264,7 @@ const CreateSpot = ({spot, buttonName}) => {
             </div>
             <hr></hr>
             <h2>Describe your place to guests</h2>
-            <p>Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood</p>
+            <p>Mention the best features of your space, any special amentities like fast wifi or parking, and what you love about the neighborhood.</p>
             <label>
                 <input
                     className="input-box description-box"

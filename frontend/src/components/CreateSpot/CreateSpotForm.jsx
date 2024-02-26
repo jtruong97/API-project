@@ -16,7 +16,7 @@ const CreateSpotForm = () => {
     let buttonName = 'Create Spot'
     return(
         <>
-            <h1 className='form-header'>Create a new Spot</h1>
+            <h1 className='form-header'>Create a New Spot</h1>
             <CreateSpot spot={spot} buttonName={buttonName}/>
         </>
     )
