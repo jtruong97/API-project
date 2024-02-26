@@ -91,8 +91,35 @@ export const deleteExistingSpot = (spotId) => async (dispatch) => {
     }
 }
 
+//delete imgs
+// const deleteImgs = async (imgs) => {
+//     const response = await imgs.map(img => {
+//         csrfFetch(`/api/spot-images/${img.id}`, {
+//             method: 'DELETE'
+//         })
+//     })
+//     if(response.ok){
+//         await Promise.all(response)
+//     }
+// }
+
 //update spot
 export const updateExistingSpot = (spot, spotId) => async (dispatch) => {
+    // console.log(spot,'SPOT HERE!!!!!!!')
+    // spot.SpotImages.map(img => {
+    //     console.log(Object.values(img), 'img here')
+    // })
+    // // let count = [0,1,2,3,4]
+    // // count.map(num => {
+    // //     delete spot.SpotImages[num]
+    // // })
+    // let deleteImgs = spot.SpotImages.map(img => { //delete exisiting imgs
+    //     console.log(img,'IMG HERE')
+    //     return csrfFetch(`/api/spot-images/${img.id}`,{
+    //         method:'DELETE'
+    //     })
+    // })
+    //await Promise.all(deleteImgs)
     const response = await csrfFetch(`/api/spots/${spotId}`, {
         method: 'PUT',
         body: JSON.stringify(spot)
@@ -115,6 +142,36 @@ export const updateExistingSpot = (spot, spotId) => async (dispatch) => {
         console.error('Error, could not update spot')
     }
 }
+// export const updateExistingSpot = (spot, spotId) => async (dispatch) => {
+//     const response = await csrfFetch(`/api/spots/${spotId}`, {
+//         method: 'PUT',
+//         body: JSON.stringify(spot)
+//     });
+
+//     if (response.ok) {
+//         const data = await response.json();
+//         dispatch(updateSpot(data));
+
+//         if (spot.SpotImages && spot.SpotImages.length > 0) {
+//             let images = await Promise.all(spot.SpotImages.map(async (img) => {
+//                 return csrfFetch(`/api/spots/${data.id}/images`, {
+//                     method: 'POST',
+//                     body: JSON.stringify({
+//                         url: img.url
+//                     })
+//                 });
+//             }));
+//             console.log('IMAGES', images)
+//         }
+
+//         return data;
+//     }
+
+//     if (!response.ok) {
+//         console.error('Error, could not update spot');
+//     }
+// }
+
 
 //reducer
 function spotReducer (state={}, action){

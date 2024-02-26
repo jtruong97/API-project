@@ -16,7 +16,6 @@ const UpdateSpot = () => {
         dispatch(fetchSpecificSpot(spotId))
     },[spotId, dispatch])
 
-    //console.log('CURRENT SPOT',currSpot)
     let buttonName = 'Update Spot'
 
     return(
