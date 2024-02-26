@@ -104,7 +104,7 @@ export const deleteExistingSpot = (spotId) => async (dispatch) => {
 // }
 
 //update spot
-export const updateExistingSpot = (spot, spotId) => async (dispatch) => {
+export const updateExistingSpot = (newSpot, preSpot) => async (dispatch) => {
     // console.log(spot,'SPOT HERE!!!!!!!')
     // spot.SpotImages.map(img => {
     //     console.log(Object.values(img), 'img here')
@@ -120,22 +120,31 @@ export const updateExistingSpot = (spot, spotId) => async (dispatch) => {
     //     })
     // })
     //await Promise.all(deleteImgs)
-    const response = await csrfFetch(`/api/spots/${spotId}`, {
+    console.log(newSpot, 'new spot')
+    const response = await csrfFetch(`/api/spots/${preSpot.id}`, {
         method: 'PUT',
-        body: JSON.stringify(spot)
-    })
+        body: JSON.stringify(newSpot)
+   })
     if(response.ok){
         const data = await response.json();
         dispatch(updateSpot(data))
 
-        spot.SpotImages.map(img => {
-            csrfFetch(`/api/spots/${data.id}/images`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    url: img.url
+        if(preSpot.SpotImages) {
+            preSpot.SpotImages.forEach(async(img) => {
+                await csrfFetch(`/api/spot-images/${img.id}`, {
+                    method: 'DELETE'
                 })
             })
-        })
+            newSpot.SpotImages.map(img => {
+                csrfFetch(`/api/spots/${data.id}/images`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        url: img.url
+                    })
+                })
+            })
+        }
+
         return data;
     }
     if(!response.ok){

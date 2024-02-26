@@ -153,14 +153,14 @@ const CreateSpot = ({spot, buttonName}) => {
         let smallImg= [img1,img2,img3,img4]
         smallImg.map(url => {
             if(url){
-                images.push({url:url, preview: true})
+                images.push({url:url, preview: false}) //id:undef
             }
         })
 
-        spot = {ownerId: currUser, country, address, city, state, lat, lng, description, name, price, SpotImages:images}
-
+        let newSpotInfo = {ownerId: currUser, country, address, city, state, lat, lng, description, name, price, SpotImages:images}
+        //spot = {ownerId: currUser, country, address, city, state, lat, lng, description, name, price, SpotImages:[previewImage, img1, img2, img3, img4]}
         if(!checkSpot[0]){ //new spot
-            let newSpot = await dispatch(createNewSpot(spot))
+            let newSpot = await dispatch(createNewSpot(newSpotInfo))
                 .catch(async(res) => {
                     const data = await res.json();
                     if(data?.errors){
@@ -174,7 +174,7 @@ const CreateSpot = ({spot, buttonName}) => {
         }
         if(checkSpot[0]){ //updating
             console.log('SPOT HERE IN JSX', spot) //does not have id
-            let updateSpot = await dispatch(updateExistingSpot(spot, spotId))
+            let updateSpot = await dispatch(updateExistingSpot(newSpotInfo, spot, spotId))
             if(updateSpot && updateSpot.id){
                 nav(`/spots/current`)
             }
