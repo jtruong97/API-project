@@ -1,36 +1,54 @@
 import { useDispatch, useSelector } from "react-redux"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { createNewSpot, updateExistingSpot } from "../../store/spots"
-
 import './CreateSpot.css'
-
 
 const CreateSpot = ({spot, buttonName}) => {
     let currUser = useSelector(state => state.session.user)
     // const reviews = useSelector(state => {return state.reviewState})
+    const [country, setCountry] = useState('' || spot?.country);
+    const [address, setAddress] = useState('' || spot?.address);
+    const [city, setCity] = useState('' ||spot?.city);
+    const [state, setState] = useState('' || spot?.state);
+    const [lat, setLat] = useState('' || spot?.lat);
+    const [lng, setLng] = useState('' || spot?.lng);
+    const [description, setDescription] = useState('' || spot?.description);
+    const [name, setName] = useState('' || spot?.name);
+    const [price, setPrice] = useState('' || spot?.price);
+    const [previewImage, setPreviewImage] = useState(spot?.previewImage || '');
+    const [imgArr, setImgArr] = useState([]);
 
-    const [country, setCountry] = useState(''|| spot.country);
-    const [address, setAddress] = useState('' || spot.address);
-    const [city, setCity] = useState('' ||spot.city);
-    const [state, setState] = useState('' || spot.state);
-    const [lat, setLat] = useState('' || spot.lat);
-    const [lng, setLng] = useState('' || spot.lng);
-    const [description, setDescription] = useState('' || spot.description);
-    const [name, setName] = useState('' || spot.name);
-    const [price, setPrice] = useState('' || spot.price);
-    const [previewImage, setPreviewImage] = useState(spot.previewImage || '');
+    useEffect(() => {
+        if (spot?.SpotImages) {
+            const urls = spot.SpotImages.map(image => image.url);
+            setImgArr(urls);
+        }
+    }, [spot]);
 
-    let imgArr = []
-    if(spot.SpotImages){
-        spot.SpotImages.map((image) => {
-            imgArr.push(image.url)
-        })
-    }
-    const [img1, setImg1] = useState(imgArr[1] || '');
-    const [img2, setImg2] = useState(imgArr[2] || '');
-    const [img3, setImg3] = useState(imgArr[3] || '');
-    const [img4, setImg4] = useState(imgArr[4] || '');
+    const [img1, setImg1] = useState('');
+    const [img2, setImg2] = useState('');
+    const [img3, setImg3] = useState('');
+    const [img4, setImg4] = useState('');
+
+    useEffect(() => {
+        if (imgArr.length > 0) {
+            setImg1(imgArr[1] || '');
+            setImg2(imgArr[2] || '');
+            setImg3(imgArr[3] || '');
+            setImg4(imgArr[4] || '');
+        }
+    }, [imgArr]);
+    // let imgArr = []
+    // if(spot?.SpotImages){
+    //     spot?.SpotImages.map((image) => {
+    //         imgArr.push(image.url)
+    //     })
+    // }
+    // const [img1, setImg1] = useState('' || imgArr[1]);
+    // const [img2, setImg2] = useState('' || imgArr[2]);
+    // const [img3, setImg3] = useState('' || imgArr[3]);
+    // const [img4, setImg4] = useState('' || imgArr[4]);
     const [errors, setErrors] = useState({});
     const dispatch = useDispatch();
     const nav = useNavigate();
@@ -112,14 +130,14 @@ const CreateSpot = ({spot, buttonName}) => {
 
         const imgVal = [img1, img2, img3, img4];
         imgVal.forEach((imgVal, index) => {
-            if (imgVal && !imgVal.endsWith('.png') && !imgVal.endsWith('.jpg') && !imgVal.endsWith('.jpeg')) {
+            if (imgVal && !(imgVal.endsWith('.png') || imgVal.endsWith('.jpg') || imgVal.endsWith('.jpeg'))) {
                 setErrors(prevErrors => ({
                     ...prevErrors,
                     [`img${index + 1}`]: 'Image URL must end in .png, .jpg, or .jpeg'
                 }));
             }
         });
-        if(!previewImage.endsWith('.png') && !previewImage.endsWith('.jpg') && !previewImage.endsWith('.jpeg')){
+        if(!previewImage.endsWith('.png') || !previewImage.endsWith('.jpg') || !previewImage.endsWith('.jpeg')){
             setErrors(prevErrors => ({
                 ...prevErrors,
                 previewImage: 'Preview image must end in .png, .jpg, or ,jpeg'
@@ -155,6 +173,7 @@ const CreateSpot = ({spot, buttonName}) => {
             if(!newSpot) return null
         }
         if(checkSpot[0]){ //updating
+            console.log('SPOT HERE IN JSX', spot) //does not have id
             let updateSpot = await dispatch(updateExistingSpot(spot, spotId))
             if(updateSpot && updateSpot.id){
                 nav(`/spots/current`)
